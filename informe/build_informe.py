@@ -109,7 +109,7 @@ def tabla_teorica(filas, encabezados):
     story.append(Spacer(1, 10))
 
 
-# ---------------------------------------------------------------- portada --
+# portada
 story.append(Spacer(1, 40))
 story.append(Paragraph("ESTRUCTURAS DE DATOS - 2026-2", styles["Sub"]))
 story.append(Paragraph("Implementacion y Analisis de Complejidad de Listas, Pilas y Colas en Java", styles["Titulo"]))
@@ -122,7 +122,6 @@ story.append(Paragraph("<b>Profesor:</b> David Herrera &nbsp;&nbsp; <b>Monitora:
 story.append(Paragraph(f'<b>Repositorio:</b> <link href="{URL_REPO}">{URL_REPO}</link>', styles["Cuerpo"]))
 story.append(Spacer(1, 20))
 
-# --------------------------------------------------------------- objetivo --
 h1("1. Objetivo del taller")
 p("""El objetivo de este taller es implementar en Java la estructura List usando listas
 enlazadas en sus cuatro variantes (simple sin cola, simple con cola, doble sin cola y
@@ -132,7 +131,6 @@ el tiempo de ejecucion de cada metodo para distintos tamanos de entrada, compara
 tiempos contra la complejidad teorica en notacion Big-O, y sacar conclusiones sobre
 quien conviene usar en cada caso.""")
 
-# ------------------------------------------------------------ implementacion --
 h1("2. Explicacion de la implementacion")
 
 h2("2.1 List (listas enlazadas)")
@@ -193,7 +191,6 @@ extrapolar dos ordenes de magnitud mas no cambia la conclusion.""")
 
 story.append(PageBreak())
 
-# ------------------------------------------------------ complejidad teorica --
 h1("3. Analisis de complejidad")
 
 h2("3.1 List: complejidad teorica")
@@ -282,14 +279,11 @@ frente.""")
 story.append(PageBreak())
 
 h2("3.7 Comparativa de metodos equivalentes (List vs MyStack/MyQueue)")
-p("""Para esta comparacion se eligio siempre <b>DoublyLinkedListWithTail</b> como
-representante de List. La razon es que, segun la tabla teorica de 3.1, es la unica de las
-4 implementaciones que queda en O(1) en todos los metodos relevantes para esta
-comparacion (pushFront, popFront, pushBack, erase); las otras 3 tienen al menos un
-metodo en O(n), asi que comparar con ellas hubiera sido comparar la version circular
-contra "la peor version posible" de List, lo cual no tendria sentido para decidir cual
-estructura conviene usar. Se compara siempre contra la version de <b>arreglo circular</b>
-de MyStack/MyQueue por ser tambien la mas optima de sus dos implementaciones.""")
+p("""Para esta comparacion se uso siempre <b>DoublyLinkedListWithTail</b> como representante
+de List, porque es la unica de las 4 que queda en O(1) en los metodos que entran aca
+(pushFront, popFront, pushBack, erase) -- comparar contra alguna de las otras 3 hubiera sido
+un poco injusto, ya que todas tienen al menos un metodo en O(n). Del lado de MyStack/MyQueue
+se usa la version de <b>arreglo circular</b>, que tambien es la mejor de las dos.""")
 
 img(os.path.join(PLOTS, "comparativa", "pushfront_vs_push.png"), ancho=6.0,
     caption="PushFront de List (uso tipico como pila) vs push de MyStack.")
@@ -311,39 +305,35 @@ elementos para cerrar el hueco.""")
 
 story.append(PageBreak())
 
-# ------------------------------------------------------------ conclusiones --
 h1("4. Conclusiones")
 story.append(ListFlowable([
-    ListItem(Paragraph("<b>Ninguna de las 4 implementaciones de List es la mejor en todo.</b> "
-                        "SinglyLinkedListNoTail es la mas simple de programar pero es la que peor escala: "
-                        "pushBack, popBack, erase y addBefore son O(n). Si solo se necesitan operaciones sobre "
-                        "el frente (pila), la version mas simple ya alcanza. Si se necesita insertar/eliminar "
-                        "por ambos extremos con costo bajo, la unica opcion realmente buena es "
-                        "DoublyLinkedListWithTail.", styles["Cuerpo"])),
-    ListItem(Paragraph("<b>El puntero a tail solo ayuda a medias en una lista simple.</b> SinglyLinkedListWithTail "
-                        "arregla pushBack pero no popBack, porque sin puntero al nodo anterior no se puede "
-                        "actualizar tail sin recorrer. Esa es la razon de fondo por la que las listas dobles "
-                        "existen: el costo extra de memoria del puntero prev se paga con operaciones O(1) en "
-                        "ambos extremos.", styles["Cuerpo"])),
-    ListItem(Paragraph("<b>El arreglo circular no sirve para todo, sirve para colas.</b> Para un Stack, donde "
-                        "push/pop siempre trabajan sobre el mismo extremo, el arreglo circular y el dinamico "
-                        "rinden igual (se confirma en las graficas de 3.5, las curvas quedan superpuestas). "
-                        "Para un Queue la historia es distinta: el arreglo dinamico obliga a desplazar todo el "
-                        "arreglo en cada dequeue (O(n)), y el circular lo resuelve en O(1) simplemente moviendo "
-                        "un indice. Es la diferencia mas grande que se vio en todo el taller.", styles["Cuerpo"])),
-    ListItem(Paragraph("<b>Arreglos dinamicos vs listas enlazadas, en general:</b> los arreglos ganan en "
-                        "localidad de memoria y en operaciones sobre un extremo fijo (mas rapidos en la "
-                        "practica por el overhead de asignar nodos), pero pierden feo apenas hay que insertar "
-                        "o eliminar en el medio o en el extremo contrario al que optimizan (arreglo dinamico "
-                        "simple = O(n) por el corrimiento de elementos). Las listas enlazadas no tienen ese "
-                        "problema porque nunca desplazan datos, solo repintan punteros, pero pagan con un nodo "
-                        "extra por elemento y peor localidad de cache.", styles["Cuerpo"])),
-    ListItem(Paragraph("<b>Cuando usar cada una en la practica:</b> un Stack de arreglo dinamico (equivalente a "
-                        "usar ArrayDeque/ArrayList en Java) alcanza para casi cualquier caso real porque push/pop "
-                        "en un extremo son O(1) de cualquier forma. Un Queue, en cambio, deberia implementarse "
-                        "siempre con arreglo circular (o con una lista doblemente enlazada con tail) y nunca con "
-                        "un arreglo dinamico simple: el resultado empirico de 3.6 deja claro que la version "
-                        "ingenua se vuelve inutilizable con colecciones grandes.", styles["Cuerpo"])),
+    ListItem(Paragraph("Ninguna de las 4 implementaciones de List gana en todo. SinglyLinkedListNoTail es la "
+                        "mas facil de programar pero tambien la que peor escala (pushBack, popBack, erase y "
+                        "addBefore quedan en O(n)); si solo se va a trabajar sobre el frente, como una pila, ya "
+                        "alcanza. Para insertar y eliminar por los dos extremos sin pagar O(n), la unica que de "
+                        "verdad cumple es DoublyLinkedListWithTail.", styles["Cuerpo"])),
+    ListItem(Paragraph("Algo que no era tan obvio antes de correr los benchmarks: el puntero a tail por si solo "
+                        "no resuelve todo. <b>SinglyLinkedListWithTail</b> arregla pushBack pero no popBack, porque "
+                        "sin puntero al nodo anterior no hay como actualizar tail sin recorrer la lista completa. "
+                        "Ahi se ve para que sirven realmente las listas dobles: el prev extra en cada nodo es lo "
+                        "que deja ambos extremos en O(1) a la vez.", styles["Cuerpo"])),
+    ListItem(Paragraph("El arreglo circular no mejora todo por igual, mejora colas. En el Stack push y pop "
+                        "siempre trabajan sobre el mismo extremo, asi que circular y dinamico terminan rindiendo "
+                        "igual (las curvas de 3.5 quedan encimadas). En el Queue si hay una diferencia real: con "
+                        "arreglo dinamico cada dequeue desplaza el arreglo entero (O(n)), con circular solo se "
+                        "mueve un indice (O(1)). Para mi fue el resultado mas claro de todo el laboratorio.",
+                        styles["Cuerpo"])),
+    ListItem(Paragraph("<b>Arreglos vs listas enlazadas, en general:</b> el arreglo gana en localidad de memoria "
+                        "y en operaciones sobre un extremo fijo (menos overhead que asignar un nodo por elemento), "
+                        "pero pierde feo apenas hay que insertar o eliminar en el medio o en el extremo que no "
+                        "optimiza. La lista enlazada no tiene ese problema porque nunca desplaza datos, solo mueve "
+                        "punteros, aunque paga con un nodo extra por elemento y peor localidad de cache.",
+                        styles["Cuerpo"])),
+    ListItem(Paragraph("En la practica, un Stack con arreglo dinamico ya es suficiente para casi cualquier caso "
+                        "real (push/pop en un extremo son O(1) de cualquier forma). Un Queue en cambio deberia ir "
+                        "siempre con arreglo circular o con una lista doblemente enlazada con tail, nunca con "
+                        "arreglo dinamico simple -- el resultado de 3.6 deja bastante claro que esa version "
+                        "ingenua se vuelve impractica con colecciones grandes.", styles["Cuerpo"])),
 ], bulletType="bullet", leftIndent=14))
 
 doc = SimpleDocTemplate(
