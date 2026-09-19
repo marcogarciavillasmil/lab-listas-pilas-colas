@@ -134,40 +134,36 @@ quien conviene usar en cada caso.""")
 h1("2. Explicacion de la implementacion")
 
 h2("2.1 List (listas enlazadas)")
-p("""Se implemento una interfaz comun <font face="Courier">MyList&lt;T&gt;</font> con los
+p("""Para List se armo una interfaz comun <font face="Courier">MyList&lt;T&gt;</font> con los
 8 metodos que pide el enunciado (pushFront, pushBack, popFront, popBack, find, erase,
-addBefore, addAfter), y 4 clases que la implementan:""")
-story.append(ListFlowable([
-    ListItem(Paragraph("<b>SinglyLinkedListNoTail:</b> solo guarda head. Todo lo que necesite llegar al final "
-                        "(pushBack, popBack, topBack) o encontrar el nodo anterior a otro (erase, addBefore) "
-                        "tiene que recorrer la lista completa.", styles["Cuerpo"])),
-    ListItem(Paragraph("<b>SinglyLinkedListWithTail:</b> agrega un puntero tail. pushBack pasa a ser O(1), pero "
-                        "popBack sigue siendo O(n) porque los nodos no tienen puntero al anterior (es simple, "
-                        "no doble) y hay que recorrer para encontrar quien queda como nuevo tail.", styles["Cuerpo"])),
-    ListItem(Paragraph("<b>DoublyLinkedListNoTail:</b> los nodos ya tienen prev y next, asi que dado un nodo, "
-                        "erase/addBefore/addAfter son O(1). El problema es que sin tail, llegar al ultimo nodo "
-                        "sigue siendo O(n).", styles["Cuerpo"])),
-    ListItem(Paragraph("<b>DoublyLinkedListWithTail:</b> head + tail + prev/next en cada nodo. Es la version "
-                        "completa: todo queda en O(1) menos find, que al no haber indexacion siempre es O(n).",
-                        styles["Cuerpo"])),
-], bulletType="bullet", leftIndent=14))
+addBefore, addAfter). La version mas simple, SinglyLinkedListNoTail, solo guarda un puntero
+a head; cualquier operacion que necesite llegar al final (pushBack, popBack, topBack) o
+encontrar el nodo anterior a otro (erase, addBefore) termina recorriendo la lista completa
+porque no hay forma mas corta de llegar ahi. Agregarle un puntero tail (SinglyLinkedListWithTail)
+resuelve pushBack -- ya no hace falta recorrer para insertar al final -- pero no resuelve
+popBack: sin puntero al nodo anterior, actualizar quien queda como nuevo tail sigue obligando
+a recorrer desde el head.""")
+p("""La solucion completa es pasar a lista doblemente enlazada. DoublyLinkedListNoTail le da a
+cada nodo un puntero prev ademas de next, asi que dado un nodo cualquiera, erase/addBefore/addAfter
+quedan en O(1); lo unico que queda pendiente es que sin tail, llegar al ultimo nodo sigue siendo
+O(n). DoublyLinkedListWithTail junta las dos cosas (head, tail, prev y next en cada nodo) y es la
+version que realmente queda en O(1) en todo menos find, que al no haber indexacion por posicion
+siempre tiene que recorrer.""")
 p("""find() devuelve la referencia al Node (no un booleano ni un indice) para poder pasarla
 despues a erase, addBefore o addAfter sin tener que volver a buscar el elemento.""")
 
 h2("2.2 MyStack y MyQueue")
-p("""Para MyStack y MyQueue se implemento cada una con dos estrategias de arreglo:""")
-story.append(ListFlowable([
-    ListItem(Paragraph("<b>Arreglo dinamico (ArrayStack / ArrayQueue):</b> arreglo interno que se duplica cuando "
-                        "se llena, igual que ArrayList. En el Stack esto alcanza para que push/pop sean O(1) "
-                        "amortizado porque ambos operan sobre el mismo extremo (el tope). En el Queue, en cambio, "
-                        "enqueue mete al final pero dequeue tiene que sacar la posicion 0 y correr todos los "
-                        "elementos restantes una posicion, lo que deja dequeue en O(n).", styles["Cuerpo"])),
-    ListItem(Paragraph("<b>Arreglo circular (CircularArrayStack / CircularArrayQueue):</b> en vez de un arreglo "
-                        "plano, se maneja un indice front y las posiciones se calculan modulo la capacidad. "
-                        "Para el Stack esto no cambia nada frente a la version dinamica (sigue operando en un "
-                        "solo extremo), pero para el Queue es la diferencia clave: dequeue deja de desplazar "
-                        "elementos, solo avanza el indice front, quedando en O(1).", styles["Cuerpo"])),
-], bulletType="bullet", leftIndent=14))
+p("""Para MyStack y MyQueue se probaron dos estrategias de arreglo. La primera (ArrayStack /
+ArrayQueue) es un arreglo interno que se duplica cuando se llena, igual que hace ArrayList por
+dentro. En el Stack esto ya alcanza para que push y pop queden en O(1) amortizado, porque las
+dos operaciones trabajan sobre el mismo extremo (el tope). En el Queue el problema aparece en
+dequeue: enqueue mete al final sin drama, pero dequeue tiene que sacar la posicion 0 y correr
+todos los elementos restantes una posicion, lo que deja esa operacion en O(n).""")
+p("""La segunda estrategia (CircularArrayStack / CircularArrayQueue) cambia el arreglo plano por
+uno circular: se mantiene un indice front y las posiciones se calculan modulo la capacidad. Para
+el Stack esto no cambia nada -- sigue operando en un solo extremo, igual que antes -- pero para
+el Queue es la diferencia que importa: dequeue deja de desplazar elementos, solo mueve el indice
+front, y queda en O(1).""")
 p("""El crecimiento del arreglo (cuando se llena) se hace duplicando la capacidad
 (capacidad *= 2), la estrategia estandar de amortizacion: el costo total de n inserciones
 sigue siendo O(n), aunque una insercion puntual pueda costar O(n) cuando toca redimensionar.""")
