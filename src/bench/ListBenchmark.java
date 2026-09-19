@@ -51,115 +51,131 @@ public class ListBenchmark {
 
             for (int n : SIZES) {
                 System.out.println(nombre + " n=" + n);
-
-                MyList<Integer> l1 = supplier.get();
-                for (int i = 0; i < n; i++) l1.pushFront(i);
                 int repsE = repsExtremos(n);
-                long total = 0;
-                for (int i = 0; i < repsE; i++) {
-                    long t0 = System.nanoTime();
-                    l1.pushFront(-1);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
-                    l1.popFront(); // deshago para no seguir creciendo
+                int repsD = repsBusqueda(n);
+
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsE; i++) {
+                        long t0 = System.nanoTime();
+                        lista.pushFront(-1);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                        lista.popFront(); // deshago para no seguir creciendo
+                    }
+                    csv.row(nombre, "pushFront", n, repsE, (total / (double) repsE) / 1000.0);
                 }
-                csv.row(nombre, "pushFront", n, repsE, (total / (double) repsE) / 1000.0);
 
                 // pushBack
-                MyList<Integer> l2 = supplier.get();
-                for (int i = 0; i < n; i++) l2.pushFront(i);
-                total = 0;
-                for (int i = 0; i < repsE; i++) {
-                    long t0 = System.nanoTime();
-                    l2.pushBack(-1);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
-                    l2.popBack();
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsE; i++) {
+                        long t0 = System.nanoTime();
+                        lista.pushBack(-1);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                        lista.popBack();
+                    }
+                    csv.row(nombre, "pushBack", n, repsE, (total / (double) repsE) / 1000.0);
                 }
-                csv.row(nombre, "pushBack", n, repsE, (total / (double) repsE) / 1000.0);
 
-                MyList<Integer> l3 = supplier.get();
-                for (int i = 0; i < n; i++) l3.pushFront(i);
-                total = 0;
-                for (int i = 0; i < repsE; i++) {
-                    l3.pushFront(-1); // sin medir
-                    long t0 = System.nanoTime();
-                    l3.popFront();
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsE; i++) {
+                        lista.pushFront(-1); // sin medir
+                        long t0 = System.nanoTime();
+                        lista.popFront();
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "popFront", n, repsE, (total / (double) repsE) / 1000.0);
                 }
-                csv.row(nombre, "popFront", n, repsE, (total / (double) repsE) / 1000.0);
 
                 // popBack
-                MyList<Integer> l4 = supplier.get();
-                for (int i = 0; i < n; i++) l4.pushFront(i);
-                total = 0;
-                for (int i = 0; i < repsE; i++) {
-                    l4.pushBack(-1);
-                    long t0 = System.nanoTime();
-                    l4.popBack();
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsE; i++) {
+                        lista.pushBack(-1);
+                        long t0 = System.nanoTime();
+                        lista.popBack();
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "popBack", n, repsE, (total / (double) repsE) / 1000.0);
                 }
-                csv.row(nombre, "popBack", n, repsE, (total / (double) repsE) / 1000.0);
 
                 // find no modifica nada, no hace falta deshacer despues
-                MyList<Integer> l5 = supplier.get();
-                for (int i = 0; i < n; i++) l5.pushFront(i);
-                total = 0;
-                for (int i = 0; i < repsE; i++) {
-                    int target = RNG.nextInt(n);
-                    long t0 = System.nanoTime();
-                    l5.find(target);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsE; i++) {
+                        int target = RNG.nextInt(n);
+                        long t0 = System.nanoTime();
+                        lista.find(target);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "find", n, repsE, (total / (double) repsE) / 1000.0);
                 }
-                csv.row(nombre, "find", n, repsE, (total / (double) repsE) / 1000.0);
 
-                MyList<Integer> l6 = supplier.get();
-                for (int i = 0; i < n; i++) l6.pushFront(i);
-                int repsD = repsBusqueda(n);
-                total = 0;
-                for (int i = 0; i < repsD; i++) {
-                    // elijo un valor random que todavia deberia existir
-                    int target = RNG.nextInt(n);
-                    Node<Integer> nodo = l6.find(target); // no se mide, es la busqueda previa
-                    if (nodo == null) continue;
-                    long t0 = System.nanoTime();
-                    l6.erase(nodo);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsD; i++) {
+                        // elijo un valor random que todavia deberia existir
+                        int target = RNG.nextInt(n);
+                        Node<Integer> nodo = lista.find(target); // no se mide, es la busqueda previa
+                        if (nodo == null) continue;
+                        long t0 = System.nanoTime();
+                        lista.erase(nodo);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "erase", n, repsD, (total / (double) repsD) / 1000.0);
                 }
-                csv.row(nombre, "erase", n, repsD, (total / (double) repsD) / 1000.0);
 
                 // addBefore
-                MyList<Integer> l7 = supplier.get();
-                for (int i = 0; i < n; i++) l7.pushFront(i);
-                total = 0;
-                for (int i = 0; i < repsD; i++) {
-                    int target = RNG.nextInt(n);
-                    Node<Integer> nodo = l7.find(target);
-                    if (nodo == null) continue;
-                    long t0 = System.nanoTime();
-                    l7.addBefore(nodo, -1);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsD; i++) {
+                        int target = RNG.nextInt(n);
+                        Node<Integer> nodo = lista.find(target);
+                        if (nodo == null) continue;
+                        long t0 = System.nanoTime();
+                        lista.addBefore(nodo, -1);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "addBefore", n, repsD, (total / (double) repsD) / 1000.0);
                 }
-                csv.row(nombre, "addBefore", n, repsD, (total / (double) repsD) / 1000.0);
 
-                MyList<Integer> l8 = supplier.get();
-                for (int i = 0; i < n; i++) l8.pushFront(i);
-                total = 0;
-                for (int i = 0; i < repsD; i++) {
-                    int target = RNG.nextInt(n);
-                    Node<Integer> nodo = l8.find(target);
-                    if (nodo == null) continue;
-                    long t0 = System.nanoTime();
-                    l8.addAfter(nodo, -1);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsD; i++) {
+                        int target = RNG.nextInt(n);
+                        Node<Integer> nodo = lista.find(target);
+                        if (nodo == null) continue;
+                        long t0 = System.nanoTime();
+                        lista.addAfter(nodo, -1);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "addAfter", n, repsD, (total / (double) repsD) / 1000.0);
                 }
-                csv.row(nombre, "addAfter", n, repsD, (total / (double) repsD) / 1000.0);
             }
         }
         csv.close();

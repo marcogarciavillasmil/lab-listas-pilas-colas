@@ -30,55 +30,63 @@ public class QueueBenchmark {
                 int reps = n <= 1000 ? 300 : n <= 10_000 ? 150 : n <= 100_000 ? 50 : 15;
                 int repsDel = Math.max(5, Math.min(100, n / 20));
 
-                MyQueue<Integer> q1 = supplier.get();
-                for (int i = 0; i < n; i++) q1.enqueue(i);
-                long total = 0;
-                for (int i = 0; i < reps; i++) {
-                    long t0 = System.nanoTime();
-                    q1.enqueue(-1);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
-                    q1.delete(-1); // saco lo que acabo de meter sin tocar el resto del orden
+                {
+                    MyQueue<Integer> cola = supplier.get();
+                    for (int i = 0; i < n; i++) cola.enqueue(i);
+                    long total = 0;
+                    for (int i = 0; i < reps; i++) {
+                        long t0 = System.nanoTime();
+                        cola.enqueue(-1);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                        cola.delete(-1); // saco lo que acabo de meter sin tocar el resto del orden
+                    }
+                    csv.row(nombre, "enqueue", n, reps, (total / (double) reps) / 1000.0);
                 }
-                csv.row(nombre, "enqueue", n, reps, (total / (double) reps) / 1000.0);
 
                 // aqui no puedo "restaurar" facilmente porque dequeue saca el frente,
                 // asi que dejo crecer un colchon extra al armar la base y mido
                 // directo, sin deshacer
-                MyQueue<Integer> q2 = supplier.get();
-                for (int i = 0; i < n + reps; i++) q2.enqueue(i);
-                total = 0;
-                for (int i = 0; i < reps; i++) {
-                    long t0 = System.nanoTime();
-                    q2.dequeue();
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyQueue<Integer> cola = supplier.get();
+                    for (int i = 0; i < n + reps; i++) cola.enqueue(i);
+                    long total = 0;
+                    for (int i = 0; i < reps; i++) {
+                        long t0 = System.nanoTime();
+                        cola.dequeue();
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "dequeue", n, reps, (total / (double) reps) / 1000.0);
                 }
-                csv.row(nombre, "dequeue", n, reps, (total / (double) reps) / 1000.0);
 
-                MyQueue<Integer> q3 = supplier.get();
-                for (int i = 0; i < n; i++) q3.enqueue(i);
-                total = 0;
-                for (int i = 0; i < reps; i++) {
-                    long t0 = System.nanoTime();
-                    q3.front();
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyQueue<Integer> cola = supplier.get();
+                    for (int i = 0; i < n; i++) cola.enqueue(i);
+                    long total = 0;
+                    for (int i = 0; i < reps; i++) {
+                        long t0 = System.nanoTime();
+                        cola.front();
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "front", n, reps, (total / (double) reps) / 1000.0);
                 }
-                csv.row(nombre, "front", n, reps, (total / (double) reps) / 1000.0);
 
                 // delete
-                MyQueue<Integer> q4 = supplier.get();
-                for (int i = 0; i < n; i++) q4.enqueue(i);
-                total = 0;
-                for (int i = 0; i < repsDel; i++) {
-                    int target = RNG.nextInt(n);
-                    long t0 = System.nanoTime();
-                    q4.delete(target);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyQueue<Integer> cola = supplier.get();
+                    for (int i = 0; i < n; i++) cola.enqueue(i);
+                    long total = 0;
+                    for (int i = 0; i < repsDel; i++) {
+                        int target = RNG.nextInt(n);
+                        long t0 = System.nanoTime();
+                        cola.delete(target);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "delete", n, repsDel, (total / (double) repsDel) / 1000.0);
                 }
-                csv.row(nombre, "delete", n, repsDel, (total / (double) repsDel) / 1000.0);
             }
         }
         csv.close();

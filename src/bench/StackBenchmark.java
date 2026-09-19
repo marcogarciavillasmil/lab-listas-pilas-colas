@@ -30,54 +30,62 @@ public class StackBenchmark {
                 int reps = n <= 1000 ? 300 : n <= 10_000 ? 150 : n <= 100_000 ? 50 : 15;
                 int repsDel = Math.max(5, Math.min(100, n / 20));
 
-                MyStack<Integer> s1 = supplier.get();
-                for (int i = 0; i < n; i++) s1.push(i);
-                long total = 0;
-                for (int i = 0; i < reps; i++) {
-                    long t0 = System.nanoTime();
-                    s1.push(-1);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
-                    s1.pop();
+                {
+                    MyStack<Integer> pila = supplier.get();
+                    for (int i = 0; i < n; i++) pila.push(i);
+                    long total = 0;
+                    for (int i = 0; i < reps; i++) {
+                        long t0 = System.nanoTime();
+                        pila.push(-1);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                        pila.pop();
+                    }
+                    csv.row(nombre, "push", n, reps, (total / (double) reps) / 1000.0);
                 }
-                csv.row(nombre, "push", n, reps, (total / (double) reps) / 1000.0);
 
                 // pop
-                MyStack<Integer> s2 = supplier.get();
-                for (int i = 0; i < n; i++) s2.push(i);
-                total = 0;
-                for (int i = 0; i < reps; i++) {
-                    s2.push(-1);
-                    long t0 = System.nanoTime();
-                    s2.pop();
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyStack<Integer> pila = supplier.get();
+                    for (int i = 0; i < n; i++) pila.push(i);
+                    long total = 0;
+                    for (int i = 0; i < reps; i++) {
+                        pila.push(-1);
+                        long t0 = System.nanoTime();
+                        pila.pop();
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "pop", n, reps, (total / (double) reps) / 1000.0);
                 }
-                csv.row(nombre, "pop", n, reps, (total / (double) reps) / 1000.0);
 
-                MyStack<Integer> s3 = supplier.get();
-                for (int i = 0; i < n; i++) s3.push(i);
-                total = 0;
-                for (int i = 0; i < reps; i++) {
-                    long t0 = System.nanoTime();
-                    s3.peek();
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyStack<Integer> pila = supplier.get();
+                    for (int i = 0; i < n; i++) pila.push(i);
+                    long total = 0;
+                    for (int i = 0; i < reps; i++) {
+                        long t0 = System.nanoTime();
+                        pila.peek();
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "peek", n, reps, (total / (double) reps) / 1000.0);
                 }
-                csv.row(nombre, "peek", n, reps, (total / (double) reps) / 1000.0);
 
                 // delete es la unica que no es O(1), busca el target primero
-                MyStack<Integer> s4 = supplier.get();
-                for (int i = 0; i < n; i++) s4.push(i);
-                total = 0;
-                for (int i = 0; i < repsDel; i++) {
-                    int target = RNG.nextInt(n);
-                    long t0 = System.nanoTime();
-                    s4.delete(target);
-                    long t1 = System.nanoTime();
-                    total += (t1 - t0);
+                {
+                    MyStack<Integer> pila = supplier.get();
+                    for (int i = 0; i < n; i++) pila.push(i);
+                    long total = 0;
+                    for (int i = 0; i < repsDel; i++) {
+                        int target = RNG.nextInt(n);
+                        long t0 = System.nanoTime();
+                        pila.delete(target);
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "delete", n, repsDel, (total / (double) repsDel) / 1000.0);
                 }
-                csv.row(nombre, "delete", n, repsDel, (total / (double) repsDel) / 1000.0);
             }
         }
         csv.close();
