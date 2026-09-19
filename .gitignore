@@ -1,0 +1,6 @@
+out/
+*.class
+__pycache__/
+informe/preview*.png
+informe/allp*.png
+.DS_Store
