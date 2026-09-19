@@ -30,7 +30,6 @@ public class QueueBenchmark {
                 int reps = n <= 1000 ? 300 : n <= 10_000 ? 150 : n <= 100_000 ? 50 : 15;
                 int repsDel = Math.max(5, Math.min(100, n / 20));
 
-                // enqueue -----------------------------------------------------
                 MyQueue<Integer> q1 = supplier.get();
                 for (int i = 0; i < n; i++) q1.enqueue(i);
                 long total = 0;
@@ -43,10 +42,9 @@ public class QueueBenchmark {
                 }
                 csv.row(nombre, "enqueue", n, reps, (total / (double) reps) / 1000.0);
 
-                // dequeue -----------------------------------------------------
                 // aqui no puedo "restaurar" facilmente porque dequeue saca el frente,
                 // asi que dejo crecer un colchon extra al armar la base y mido
-                // directo, sin deshacer.
+                // directo, sin deshacer
                 MyQueue<Integer> q2 = supplier.get();
                 for (int i = 0; i < n + reps; i++) q2.enqueue(i);
                 total = 0;
@@ -58,7 +56,6 @@ public class QueueBenchmark {
                 }
                 csv.row(nombre, "dequeue", n, reps, (total / (double) reps) / 1000.0);
 
-                // front -------------------------------------------------------
                 MyQueue<Integer> q3 = supplier.get();
                 for (int i = 0; i < n; i++) q3.enqueue(i);
                 total = 0;
@@ -70,7 +67,7 @@ public class QueueBenchmark {
                 }
                 csv.row(nombre, "front", n, reps, (total / (double) reps) / 1000.0);
 
-                // delete ------------------------------------------------------
+                // delete
                 MyQueue<Integer> q4 = supplier.get();
                 for (int i = 0; i < n; i++) q4.enqueue(i);
                 total = 0;

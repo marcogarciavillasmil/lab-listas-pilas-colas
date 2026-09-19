@@ -30,7 +30,6 @@ public class StackBenchmark {
                 int reps = n <= 1000 ? 300 : n <= 10_000 ? 150 : n <= 100_000 ? 50 : 15;
                 int repsDel = Math.max(5, Math.min(100, n / 20));
 
-                // push ------------------------------------------------------
                 MyStack<Integer> s1 = supplier.get();
                 for (int i = 0; i < n; i++) s1.push(i);
                 long total = 0;
@@ -43,7 +42,7 @@ public class StackBenchmark {
                 }
                 csv.row(nombre, "push", n, reps, (total / (double) reps) / 1000.0);
 
-                // pop ---------------------------------------------------------
+                // pop
                 MyStack<Integer> s2 = supplier.get();
                 for (int i = 0; i < n; i++) s2.push(i);
                 total = 0;
@@ -56,7 +55,6 @@ public class StackBenchmark {
                 }
                 csv.row(nombre, "pop", n, reps, (total / (double) reps) / 1000.0);
 
-                // peek --------------------------------------------------------
                 MyStack<Integer> s3 = supplier.get();
                 for (int i = 0; i < n; i++) s3.push(i);
                 total = 0;
@@ -68,7 +66,7 @@ public class StackBenchmark {
                 }
                 csv.row(nombre, "peek", n, reps, (total / (double) reps) / 1000.0);
 
-                // delete ------------------------------------------------------
+                // delete es la unica que no es O(1), busca el target primero
                 MyStack<Integer> s4 = supplier.get();
                 for (int i = 0; i < n; i++) s4.push(i);
                 total = 0;

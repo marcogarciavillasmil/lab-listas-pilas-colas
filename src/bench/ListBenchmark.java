@@ -52,7 +52,6 @@ public class ListBenchmark {
             for (int n : SIZES) {
                 System.out.println(nombre + " n=" + n);
 
-                // pushFront -------------------------------------------------
                 MyList<Integer> l1 = supplier.get();
                 for (int i = 0; i < n; i++) l1.pushFront(i);
                 int repsE = repsExtremos(n);
@@ -66,7 +65,7 @@ public class ListBenchmark {
                 }
                 csv.row(nombre, "pushFront", n, repsE, (total / (double) repsE) / 1000.0);
 
-                // pushBack --------------------------------------------------
+                // pushBack
                 MyList<Integer> l2 = supplier.get();
                 for (int i = 0; i < n; i++) l2.pushFront(i);
                 total = 0;
@@ -79,7 +78,6 @@ public class ListBenchmark {
                 }
                 csv.row(nombre, "pushBack", n, repsE, (total / (double) repsE) / 1000.0);
 
-                // popFront ----------------------------------------------------
                 MyList<Integer> l3 = supplier.get();
                 for (int i = 0; i < n; i++) l3.pushFront(i);
                 total = 0;
@@ -92,7 +90,7 @@ public class ListBenchmark {
                 }
                 csv.row(nombre, "popFront", n, repsE, (total / (double) repsE) / 1000.0);
 
-                // popBack -----------------------------------------------------
+                // popBack
                 MyList<Integer> l4 = supplier.get();
                 for (int i = 0; i < n; i++) l4.pushFront(i);
                 total = 0;
@@ -105,7 +103,7 @@ public class ListBenchmark {
                 }
                 csv.row(nombre, "popBack", n, repsE, (total / (double) repsE) / 1000.0);
 
-                // find ----------------------------------------------------------
+                // find no modifica nada, no hace falta deshacer despues
                 MyList<Integer> l5 = supplier.get();
                 for (int i = 0; i < n; i++) l5.pushFront(i);
                 total = 0;
@@ -118,7 +116,6 @@ public class ListBenchmark {
                 }
                 csv.row(nombre, "find", n, repsE, (total / (double) repsE) / 1000.0);
 
-                // erase -----------------------------------------------------------
                 MyList<Integer> l6 = supplier.get();
                 for (int i = 0; i < n; i++) l6.pushFront(i);
                 int repsD = repsBusqueda(n);
@@ -135,7 +132,7 @@ public class ListBenchmark {
                 }
                 csv.row(nombre, "erase", n, repsD, (total / (double) repsD) / 1000.0);
 
-                // addBefore ---------------------------------------------------
+                // addBefore
                 MyList<Integer> l7 = supplier.get();
                 for (int i = 0; i < n; i++) l7.pushFront(i);
                 total = 0;
@@ -150,7 +147,6 @@ public class ListBenchmark {
                 }
                 csv.row(nombre, "addBefore", n, repsD, (total / (double) repsD) / 1000.0);
 
-                // addAfter ----------------------------------------------------
                 MyList<Integer> l8 = supplier.get();
                 for (int i = 0; i < n; i++) l8.pushFront(i);
                 total = 0;
