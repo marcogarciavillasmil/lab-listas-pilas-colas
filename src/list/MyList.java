@@ -1,9 +1,8 @@
 package list;
 
-// Interfaz comun para las 4 versiones de lista enlazada que pide el enunciado:
-// simple sin cola, simple con cola, doble sin cola y doble con cola.
-// find() devuelve el Node en vez de un booleano/indice para poder usarlo
-// despues en erase/addBefore/addAfter sin tener que volver a buscar.
+// interfaz comun a las 4 listas (simple/doble x con-sin cola).
+// find() devuelve el Node y no un bool/indice: asi despues lo puedo pasar
+// directo a erase/addBefore/addAfter sin tener que buscar dos veces.
 public interface MyList<T> {
 
     Node<T> pushFront(T value);

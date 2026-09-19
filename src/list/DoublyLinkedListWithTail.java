@@ -2,9 +2,9 @@ package list;
 
 import java.util.NoSuchElementException;
 
-// la "completa": head + tail + prev/next en cada nodo. Con eso todo queda
-// O(1) (push/pop en ambos extremos, erase, addBefore/After), menos find que
-// sigue siendo O(n) porque para buscar por valor no queda otra que recorrer.
+// la version "completa": head + tail + prev/next en cada nodo. con eso casi
+// todo queda O(1) (push/pop en ambos extremos, erase, addBefore/After).
+// find sigue en O(n) obvio, buscar por valor no tiene atajo.
 public class DoublyLinkedListWithTail<T> implements MyList<T> {
 
     private Node<T> head;

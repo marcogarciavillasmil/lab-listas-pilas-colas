@@ -77,12 +77,10 @@ def tabla_resultados(datos, impl, metodos, encabezado="n"):
         filas.append(fila)
     t = Table(filas, hAlign="LEFT")
     t.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2a78d6")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
         ("FONTSIZE", (0, 0), (-1, -1), 8),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f2f1ec")]),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c3c2b7")),
+        ("LINEBELOW", (0, 0), (-1, 0), 0.75, colors.black),
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#999999")),
         ("ALIGN", (1, 0), (-1, -1), "CENTER"),
         ("TOPPADDING", (0, 0), (-1, -1), 3),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
@@ -95,12 +93,10 @@ def tabla_teorica(filas, encabezados):
     data = [encabezados] + filas
     t = Table(data, hAlign="LEFT")
     t.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0b0b0b")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
         ("FONTSIZE", (0, 0), (-1, -1), 8.5),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f2f1ec")]),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c3c2b7")),
+        ("LINEBELOW", (0, 0), (-1, 0), 0.75, colors.black),
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#999999")),
         ("ALIGN", (1, 0), (-1, -1), "CENTER"),
         ("TOPPADDING", (0, 0), (-1, -1), 3),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
@@ -134,7 +130,7 @@ quien conviene usar en cada caso.""")
 h1("2. Explicacion de la implementacion")
 
 h2("2.1 List (listas enlazadas)")
-p("""Para List se armo una interfaz comun <font face="Courier">MyList&lt;T&gt;</font> con los
+p("""Para List arme una interfaz comun <font face="Courier">MyList&lt;T&gt;</font> con los
 8 metodos que pide el enunciado (pushFront, pushBack, popFront, popBack, find, erase,
 addBefore, addAfter). La version mas simple, SinglyLinkedListNoTail, solo guarda un puntero
 a head; cualquier operacion que necesite llegar al final (pushBack, popBack, topBack) o
@@ -153,7 +149,7 @@ p("""find() devuelve la referencia al Node (no un booleano ni un indice) para po
 despues a erase, addBefore o addAfter sin tener que volver a buscar el elemento.""")
 
 h2("2.2 MyStack y MyQueue")
-p("""Para MyStack y MyQueue se probaron dos estrategias de arreglo. La primera (ArrayStack /
+p("""Para MyStack y MyQueue probe dos estrategias de arreglo. La primera (ArrayStack /
 ArrayQueue) es un arreglo interno que se duplica cuando se llena, igual que hace ArrayList por
 dentro. En el Stack esto ya alcanza para que push y pop queden en O(1) amortizado, porque las
 dos operaciones trabajan sobre el mismo extremo (el tope). En el Queue el problema aparece en
@@ -164,24 +160,24 @@ uno circular: se mantiene un indice front y las posiciones se calculan modulo la
 el Stack esto no cambia nada -- sigue operando en un solo extremo, igual que antes -- pero para
 el Queue es la diferencia que importa: dequeue deja de desplazar elementos, solo mueve el indice
 front, y queda en O(1).""")
-p("""El crecimiento del arreglo (cuando se llena) se hace duplicando la capacidad
+p("""El crecimiento del arreglo lo manejo duplicando la capacidad cuando se llena
 (capacidad *= 2), la estrategia estandar de amortizacion: el costo total de n inserciones
 sigue siendo O(n), aunque una insercion puntual pueda costar O(n) cuando toca redimensionar.""")
 
 h2("2.3 Medicion de tiempos")
-p("""La medicion sigue el mismo patron del Main.java de referencia (Instant/Duration), pero
+p("""Para medir segui el mismo patron del Main.java de referencia (Instant/Duration), pero
 usando <font face="Courier">System.nanoTime()</font> y reportando en microsegundos: en
-listas chicas, milisegundos redondeaba todo a 0 y no se alcanzaba a notar la diferencia
-entre un metodo O(1) y uno O(n). Para cada tamano n se arma primero la estructura con n
+listas chicas, milisegundos redondeaba todo a 0 y no alcanzaba a notarse la diferencia
+entre un metodo O(1) y uno O(n). Para cada tamano n armo primero la estructura con n
 elementos (usando siempre un metodo O(1) para no distorsionar el tiempo de armado), y
-despues se repite el metodo que se quiere medir varias veces seguidas, promediando. En
-push/pop se deshace cada operacion inmediatamente despues de medirla para que el tamano
+despues repito el metodo que quiero medir varias veces seguidas, promediando. En
+push/pop deshago cada operacion inmediatamente despues de medirla para que el tamano
 de la estructura se mantenga estable durante toda la medicion. En metodos que buscan un
-valor (find, erase, addBefore, addAfter, delete) el objetivo se elige al azar (semilla
+valor (find, erase, addBefore, addAfter, delete) elijo el objetivo al azar (semilla
 fija = 42, para que sea reproducible) entre los valores existentes.""")
-p("""Los tamanos usados fueron n = 10, 100, 1000, 10 000, 100 000 y 1 000 000. El enunciado
+p("""Los tamanos que use fueron n = 10, 100, 1000, 10 000, 100 000 y 1 000 000. El enunciado
 sugiere llegar hasta 10^8, pero para los metodos O(n) eso significa que una sola corrida
-del benchmark tarda minutos, asi que se decidio limitar a 10^6: en las graficas se ve con
+del benchmark tarda minutos, asi que decidi limitar a 10^6: en las graficas se ve con
 claridad la tendencia (recta ascendente en escala log-log para O(n), plana para O(1)), y
 extrapolar dos ordenes de magnitud mas no cambia la conclusion.""")
 
@@ -213,7 +209,7 @@ p("Tiempos promedio en microsegundos, uno por metodo (las 4 implementaciones jun
 metodos_lista = ["pushFront", "pushBack", "popFront", "popBack", "find", "erase", "addBefore", "addAfter"]
 lista_datos = leer_csv("list_benchmark.csv")
 for m in metodos_lista:
-    img(os.path.join(PLOTS, "list", f"{m}.png"), ancho=6.0)
+    img(os.path.join(PLOTS, f"list_{m.lower()}.png"), ancho=6.0)
 
 story.append(PageBreak())
 
@@ -225,7 +221,7 @@ h2("Tabla de resultados - DoublyLinkedListNoTail")
 tabla_resultados(lista_datos, "DoublyNoTail", metodos_lista)
 h2("Tabla de resultados - DoublyLinkedListWithTail")
 tabla_resultados(lista_datos, "DoublyWithTail", metodos_lista)
-p("""Los resultados coinciden con lo teorico: pushBack y popBack se disparan en las
+p("""Lo que obtuve coincide con lo teorico: pushBack y popBack se disparan en las
 implementaciones sin tail (o sin tail util, caso popBack en SinglyWithTail), find crece
 en las 4 por igual, y erase/addBefore se mantienen practicamente planos solo en las
 listas dobles. addAfter es O(1) en las 4, y eso tambien se ve reflejado.""")
@@ -251,10 +247,10 @@ resto (O(n)); con arreglo circular solo se mueve el indice front (O(1)).""")
 h2("3.5 MyStack: resultados empiricos")
 pila_datos = leer_csv("stack_benchmark.csv")
 for m in ["push", "pop", "peek", "delete"]:
-    img(os.path.join(PLOTS, "stack", f"{m}.png"), ancho=6.0)
+    img(os.path.join(PLOTS, f"stack_{m}.png"), ancho=6.0)
 tabla_resultados(pila_datos, "ArrayDinamico", ["push", "pop", "peek", "delete"])
 tabla_resultados(pila_datos, "ArrayCircular", ["push", "pop", "peek", "delete"])
-p("""Tal como se esperaba, push/pop/peek quedan practicamente iguales entre las dos
+p("""Tal como esperaba, push/pop/peek quedan practicamente iguales entre las dos
 implementaciones del Stack -- las dos curvas se superponen en las graficas. delete crece
 igual en ambas porque en las dos hay que recorrer buscando el valor.""")
 
@@ -263,33 +259,33 @@ story.append(PageBreak())
 h2("3.6 MyQueue: resultados empiricos")
 cola_datos = leer_csv("queue_benchmark.csv")
 for m in ["enqueue", "dequeue", "front", "delete"]:
-    img(os.path.join(PLOTS, "queue", f"{m}.png"), ancho=6.0)
+    img(os.path.join(PLOTS, f"queue_{m}.png"), ancho=6.0)
 tabla_resultados(cola_datos, "ArrayDinamico", ["enqueue", "dequeue", "front", "delete"])
 tabla_resultados(cola_datos, "ArrayCircular", ["enqueue", "dequeue", "front", "delete"])
-p("""Aqui si se nota la diferencia: dequeue en ArrayDinamico crece de forma clara con n
+p("""Aqui si note la diferencia: dequeue en ArrayDinamico crece de forma clara con n
 (llega a mas de 8500 microsegundos en n=1 000 000), mientras que en ArrayCircular se
-mantiene practicamente plano en todo el rango. Es la mejor evidencia empirica de todo el
-taller de que el arreglo circular vale la pena quando se necesita sacar elementos por el
-frente.""")
+mantiene practicamente plano en todo el rango. Para mi es la mejor evidencia empirica de
+todo el taller de que el arreglo circular vale la pena cuando se necesita sacar elementos
+por el frente.""")
 
 story.append(PageBreak())
 
 h2("3.7 Comparativa de metodos equivalentes (List vs MyStack/MyQueue)")
-p("""Para esta comparacion se uso siempre <b>DoublyLinkedListWithTail</b> como representante
+p("""Para esta comparacion use siempre <b>DoublyLinkedListWithTail</b> como representante
 de List, porque es la unica de las 4 que queda en O(1) en los metodos que entran aca
 (pushFront, popFront, pushBack, erase) -- comparar contra alguna de las otras 3 hubiera sido
 un poco injusto, ya que todas tienen al menos un metodo en O(n). Del lado de MyStack/MyQueue
-se usa la version de <b>arreglo circular</b>, que tambien es la mejor de las dos.""")
+uso la version de <b>arreglo circular</b>, que tambien es la mejor de las dos.""")
 
-img(os.path.join(PLOTS, "comparativa", "pushfront_vs_push.png"), ancho=6.0,
+img(os.path.join(PLOTS, "cmp_pushfront_vs_push.png"), ancho=6.0,
     caption="PushFront de List (uso tipico como pila) vs push de MyStack.")
-img(os.path.join(PLOTS, "comparativa", "popfront_vs_pop.png"), ancho=6.0,
+img(os.path.join(PLOTS, "cmp_popfront_vs_pop.png"), ancho=6.0,
     caption="PopFront de List vs pop de MyStack.")
-img(os.path.join(PLOTS, "comparativa", "pushback_vs_enqueue.png"), ancho=6.0,
+img(os.path.join(PLOTS, "cmp_pushback_vs_enqueue.png"), ancho=6.0,
     caption="PushBack de List (uso tipico como cola) vs enqueue de MyQueue.")
-img(os.path.join(PLOTS, "comparativa", "popfront_vs_dequeue.png"), ancho=6.0,
+img(os.path.join(PLOTS, "cmp_popfront_vs_dequeue.png"), ancho=6.0,
     caption="PopFront de List vs dequeue de MyQueue.")
-img(os.path.join(PLOTS, "comparativa", "erase_vs_delete.png"), ancho=6.0,
+img(os.path.join(PLOTS, "cmp_erase_vs_delete.png"), ancho=6.0,
     caption="Erase de List vs delete de MyStack y MyQueue (busqueda + eliminacion).")
 p("""En push/pop puros las tres estructuras quedan practicamente empatadas -- las dos son
 O(1), la diferencia esta solo en la constante (la lista paga malloc de un nodo por cada

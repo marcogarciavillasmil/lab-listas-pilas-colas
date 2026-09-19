@@ -1,6 +1,6 @@
 package queue;
 
-// interfaz de cola, metodos minimos que pide el enunciado
+// interfaz de cola, lo minimo que pide el enunciado (igual que MyStack pero para cola)
 public interface MyQueue<T> {
     void enqueue(T x);
     T dequeue();

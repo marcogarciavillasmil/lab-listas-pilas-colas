@@ -1,6 +1,6 @@
 package stack;
 
-// interfaz de pila, metodos minimos que pide el enunciado
+// interfaz de pila, lo minimo que pide el enunciado
 public interface MyStack<T> {
     void push(T x);
     T pop();

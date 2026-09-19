@@ -1,7 +1,7 @@
 package list;
 
-// nodo generico que usan las 4 listas. lo dejo publico (con getValue) porque
-// find() necesita devolver algo que despues sirva para erase/addBefore/addAfter
+// nodo que usan las 4 listas. getValue es publico porque find() devuelve
+// el nodo entero, no solo el valor -- lo necesito para erase/addBefore/addAfter
 public class Node<T> {
     T value;
     Node<T> next;

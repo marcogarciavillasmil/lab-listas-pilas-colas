@@ -2,10 +2,10 @@ package list;
 
 import java.util.NoSuchElementException;
 
-// lista simple, solo con head (sin tail). Todo lo que toque el final de la
-// lista (pushBack, popBack, topBack) o necesite el nodo anterior a uno dado
-// (erase, addBefore) tiene que recorrerla desde el principio -> O(n).
-// addAfter si es O(1) porque ahi si tengo el nodo de referencia directo.
+// lista simple, solo con head (sin tail). todo lo que toque el final
+// (pushBack, popBack, topBack) o necesite el nodo anterior a uno dado
+// (erase, addBefore) toca recorrerla desde el principio -> O(n).
+// addAfter si es O(1), ahi si tengo el nodo de referencia directo.
 public class SinglyLinkedListNoTail<T> implements MyList<T> {
 
     private Node<T> head;

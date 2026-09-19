@@ -2,10 +2,10 @@ package list;
 
 import java.util.NoSuchElementException;
 
-// misma idea que la anterior pero ahora guardo tail. Con eso pushBack y
-// topBack quedan en O(1). popBack sigue en O(n) porque los nodos no tienen
-// puntero al anterior (es simple, no doble) y para actualizar tail hay que
-// recorrer buscando quien apunta al ultimo nodo.
+// misma idea que la anterior pero ahora guardo tail, asi pushBack y topBack
+// quedan en O(1). popBack sigue en O(n): los nodos no tienen puntero al
+// anterior (es simple, no doble) entonces para saber quien va a quedar de
+// tail toca recorrer igual que antes.
 public class SinglyLinkedListWithTail<T> implements MyList<T> {
 
     private Node<T> head;

@@ -2,10 +2,10 @@ package queue;
 
 import java.util.NoSuchElementException;
 
-// ahora la cola guarda un indice front y calcula las posiciones modulo la
-// capacidad (buffer circular). Ya no hay que correr nada al hacer dequeue:
-// solo se mueve el indice front y listo, O(1). Este es el punto que se
-// compara contra ArrayQueue en el informe.
+// aca la cola guarda un indice front y calcula posiciones modulo la capacidad
+// (buffer circular). ya no hay que correr nada en dequeue: se mueve el indice
+// front y listo, O(1). este es el punto fuerte que comparo contra ArrayQueue
+// en el informe (ahi si vale la pena el circular, a diferencia de la pila).
 public class CircularArrayQueue<T> implements MyQueue<T> {
 
     private Object[] data;

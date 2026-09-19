@@ -2,10 +2,10 @@ package list;
 
 import java.util.NoSuchElementException;
 
-// ahora cada nodo tiene prev y next, pero sigo sin guardar tail.
-// erase/addBefore/addAfter quedan en O(1) porque con prev/next ya no hace
-// falta buscar al vecino. El problema es llegar al ultimo nodo: como no hay
-// tail, pushBack/popBack/topBack tienen que recorrer todo -> O(n).
+// ahora cada nodo tiene prev y next, pero sigo sin tail. con prev/next ya no
+// toca buscar al vecino, entonces erase/addBefore/addAfter quedan en O(1).
+// el problema sigue siendo llegar al ultimo nodo: sin tail, pushBack/popBack/
+// topBack tienen que recorrer todo -> O(n), igual que en la version anterior.
 public class DoublyLinkedListNoTail<T> implements MyList<T> {
 
     private Node<T> head;
