@@ -4,8 +4,7 @@ Implementacion y analisis de complejidad de `List` (4 variantes de lista enlazad
 `MyStack` y `MyQueue` (arreglo dinamico y arreglo circular), para el taller de
 Estructuras de Datos.
 
-El informe completo (objetivo, explicacion, analisis teorico vs empirico, graficas
-y conclusiones) esta en [`informe/Stack-Queue-Java-ED-1094050756.pdf`](informe/Stack-Queue-Java-ED-1094050756.pdf).
+El informe completo esta en [`informe/Stack-Queue-Java-ED-1094050756.pdf`](informe/Stack-Queue-Java-ED-1094050756.pdf).
 
 ## Estructura del proyecto
 
