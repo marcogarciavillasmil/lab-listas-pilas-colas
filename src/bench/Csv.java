@@ -14,7 +14,8 @@ public final class Csv {
         out.println(header);
     }
 
-    public void row(Object... cols) {
+    public void row(Object... cols)
+    {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cols.length; i++) {
             if (i > 0) sb.append(',');
@@ -24,7 +25,5 @@ public final class Csv {
         out.flush();
     }
 
-    public void close() {
-        out.close();
-    }
+    public void close() { out.close(); }
 }

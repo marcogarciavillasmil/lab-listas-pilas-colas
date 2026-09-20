@@ -1,11 +1,10 @@
 package stack;
 
-// interfaz de pila, lo minimo que pide el enunciado
 public interface MyStack<T> {
+    boolean isEmpty();
+    int size();
     void push(T x);
     T pop();
     T peek();
-    boolean isEmpty();
-    int size();
-    void delete(T n); // borra la primera ocurrencia de n buscando desde el tope
+    void delete(T n);
 }

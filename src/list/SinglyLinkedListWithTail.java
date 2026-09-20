@@ -2,15 +2,19 @@ package list;
 
 import java.util.NoSuchElementException;
 
-// misma idea que la anterior pero ahora guardo tail, asi pushBack y topBack
-// quedan en O(1). popBack sigue en O(n): los nodos no tienen puntero al
-// anterior (es simple, no doble) entonces para saber quien va a quedar de
-// tail toca recorrer igual que antes.
 public class SinglyLinkedListWithTail<T> implements MyList<T> {
 
     private Node<T> head;
     private Node<T> tail;
     private int count;
+
+    @Override
+    public boolean empty() {
+        return head == null;
+    }
+
+    @Override
+    public int size() { return count; }
 
     @Override
     public Node<T> pushFront(T value) {
@@ -23,7 +27,8 @@ public class SinglyLinkedListWithTail<T> implements MyList<T> {
     }
 
     @Override
-    public Node<T> pushBack(T value) {
+    public Node<T> pushBack(T value)
+    {
         Node<T> node = new Node<>(value);
         if (tail == null) {
             head = tail = node;
@@ -48,19 +53,33 @@ public class SinglyLinkedListWithTail<T> implements MyList<T> {
     @Override
     public T popBack() {
         if (head == null) throw new NoSuchElementException("lista vacía");
-        T value;
+        T val;
         if (head == tail) {
-            value = head.value;
+            val = head.value;
             head = tail = null;
         } else {
             Node<T> prev = head;
-            while (prev.next != tail) prev = prev.next;
-            value = tail.value;
+            while (prev.next != tail)
+                prev = prev.next;
+            val = tail.value;
             prev.next = null;
             tail = prev;
         }
         count--;
-        return value;
+        return val;
+    }
+
+    @Override
+    public T topFront()
+    {
+        if (head == null) throw new NoSuchElementException("lista vacía");
+        return head.value;
+    }
+
+    @Override
+    public T topBack() {
+        if (tail == null) throw new NoSuchElementException("lista vacía");
+        return tail.value;
     }
 
     @Override
@@ -96,45 +115,24 @@ public class SinglyLinkedListWithTail<T> implements MyList<T> {
         if (node == null) return null;
         if (node == head) return pushFront(value);
         Node<T> prev = head;
-        while (prev != null && prev.next != node) prev = prev.next;
+        while (prev != null && prev.next != node)
+            prev = prev.next;
         if (prev == null) return null;
-        Node<T> newNode = new Node<>(value);
-        newNode.next = node;
-        prev.next = newNode;
+        Node<T> nn = new Node<>(value);
+        nn.next = node;
+        prev.next = nn;
         count++;
-        return newNode;
+        return nn;
     }
 
     @Override
     public Node<T> addAfter(Node<T> node, T value) {
         if (node == null) return null;
-        Node<T> newNode = new Node<>(value);
-        newNode.next = node.next;
-        node.next = newNode;
-        if (node == tail) tail = newNode;
+        Node<T> nn = new Node<>(value);
+        nn.next = node.next;
+        node.next = nn;
+        if (node == tail) tail = nn;
         count++;
-        return newNode;
-    }
-
-    @Override
-    public boolean empty() {
-        return head == null;
-    }
-
-    @Override
-    public int size() {
-        return count;
-    }
-
-    @Override
-    public T topFront() {
-        if (head == null) throw new NoSuchElementException("lista vacía");
-        return head.value;
-    }
-
-    @Override
-    public T topBack() {
-        if (tail == null) throw new NoSuchElementException("lista vacía");
-        return tail.value;
+        return nn;
     }
 }

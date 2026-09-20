@@ -12,28 +12,24 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
-// corre los 8 metodos de List (pushfront, pushback, popfront, popback, find,
-// erase, addbefore, addafter) en las 4 implementaciones y distintos tamanos,
-// y deja todo en results/list_benchmark.csv
 public class ListBenchmark {
 
-    static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
     static final Random RNG = new Random(42);
-
-    static int repsExtremos(int n) {
-        if (n <= 1000) return 300;
-        if (n <= 10_000) return 150;
-        if (n <= 100_000) return 50;
-        return 15;
-    }
+    static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
 
     static int repsBusqueda(int n) {
-        // para erase/addBefore/addAfter no restauro el elemento borrado/insertado,
-        // asi que uso pocas repeticiones para no vaciar/inflar demasiado la lista
         int r = n / 20;
         if (r < 5) r = 5;
         if (r > 100) r = 100;
         return r;
+    }
+
+    static int repsExtremos(int n)
+    {
+        if (n <= 1000) return 300;
+        if (n <= 10_000) return 150;
+        if (n <= 100_000) return 50;
+        return 15;
     }
 
     public static void run() throws Exception {
@@ -63,12 +59,11 @@ public class ListBenchmark {
                         lista.pushFront(-1);
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
-                        lista.popFront(); // deshago para no seguir creciendo
+                        lista.popFront();
                     }
                     csv.row(nombre, "pushFront", n, repsE, (total / (double) repsE) / 1000.0);
                 }
 
-                // pushBack
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
@@ -88,7 +83,7 @@ public class ListBenchmark {
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
                     for (int i = 0; i < repsE; i++) {
-                        lista.pushFront(-1); // sin medir
+                        lista.pushFront(-1);
                         long t0 = System.nanoTime();
                         lista.popFront();
                         long t1 = System.nanoTime();
@@ -97,7 +92,6 @@ public class ListBenchmark {
                     csv.row(nombre, "popFront", n, repsE, (total / (double) repsE) / 1000.0);
                 }
 
-                // popBack
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
@@ -112,7 +106,6 @@ public class ListBenchmark {
                     csv.row(nombre, "popBack", n, repsE, (total / (double) repsE) / 1000.0);
                 }
 
-                // find no modifica nada, no hace falta deshacer despues
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
@@ -132,9 +125,8 @@ public class ListBenchmark {
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
                     for (int i = 0; i < repsD; i++) {
-                        // elijo un valor random que todavia deberia existir
                         int target = RNG.nextInt(n);
-                        Node<Integer> nodo = lista.find(target); // no se mide, es la busqueda previa
+                        Node<Integer> nodo = lista.find(target);
                         if (nodo == null) continue;
                         long t0 = System.nanoTime();
                         lista.erase(nodo);
@@ -144,7 +136,6 @@ public class ListBenchmark {
                     csv.row(nombre, "erase", n, repsD, (total / (double) repsD) / 1000.0);
                 }
 
-                // addBefore
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);

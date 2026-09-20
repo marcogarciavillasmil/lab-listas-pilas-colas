@@ -2,10 +2,6 @@ package list;
 
 import java.util.NoSuchElementException;
 
-// ahora cada nodo tiene prev y next, pero sigo sin tail. con prev/next ya no
-// toca buscar al vecino, entonces erase/addBefore/addAfter quedan en O(1).
-// el problema sigue siendo llegar al ultimo nodo: sin tail, pushBack/popBack/
-// topBack tienen que recorrer todo -> O(n), igual que en la version anterior.
 public class DoublyLinkedListNoTail<T> implements MyList<T> {
 
     private Node<T> head;
@@ -13,9 +9,18 @@ public class DoublyLinkedListNoTail<T> implements MyList<T> {
 
     private Node<T> lastNode() {
         Node<T> cur = head;
-        while (cur != null && cur.next != null) cur = cur.next;
+        while (cur != null && cur.next != null)
+            cur = cur.next;
         return cur;
     }
+
+    @Override
+    public int size() {
+        return count;
+    }
+
+    @Override
+    public boolean empty() { return head == null; }
 
     @Override
     public Node<T> pushFront(T value) {
@@ -28,7 +33,8 @@ public class DoublyLinkedListNoTail<T> implements MyList<T> {
     }
 
     @Override
-    public Node<T> pushBack(T value) {
+    public Node<T> pushBack(T value)
+    {
         Node<T> last = lastNode();
         Node<T> node = new Node<>(value);
         if (last == null) {
@@ -55,9 +61,23 @@ public class DoublyLinkedListNoTail<T> implements MyList<T> {
     public T popBack() {
         Node<T> last = lastNode();
         if (last == null) throw new NoSuchElementException("lista vacía");
-        T value = last.value;
+        T val = last.value;
         erase(last);
-        return value;
+        return val;
+    }
+
+    @Override
+    public T topFront() {
+        if (head == null) throw new NoSuchElementException("lista vacía");
+        return head.value;
+    }
+
+    @Override
+    public T topBack()
+    {
+        Node<T> last = lastNode();
+        if (last == null) throw new NoSuchElementException("lista vacía");
+        return last.value;
     }
 
     @Override
@@ -83,49 +103,26 @@ public class DoublyLinkedListNoTail<T> implements MyList<T> {
     public Node<T> addBefore(Node<T> node, T value) {
         if (node == null) return null;
         if (node == head) return pushFront(value);
-        Node<T> newNode = new Node<>(value);
+        Node<T> nn = new Node<>(value);
         Node<T> prev = node.prev;
-        newNode.prev = prev;
-        newNode.next = node;
-        prev.next = newNode;
-        node.prev = newNode;
+        nn.prev = prev;
+        nn.next = node;
+        prev.next = nn;
+        node.prev = nn;
         count++;
-        return newNode;
+        return nn;
     }
 
     @Override
     public Node<T> addAfter(Node<T> node, T value) {
         if (node == null) return null;
-        Node<T> newNode = new Node<>(value);
+        Node<T> nn = new Node<>(value);
         Node<T> next = node.next;
-        newNode.prev = node;
-        newNode.next = next;
-        node.next = newNode;
-        if (next != null) next.prev = newNode;
+        nn.prev = node;
+        nn.next = next;
+        node.next = nn;
+        if (next != null) next.prev = nn;
         count++;
-        return newNode;
-    }
-
-    @Override
-    public boolean empty() {
-        return head == null;
-    }
-
-    @Override
-    public int size() {
-        return count;
-    }
-
-    @Override
-    public T topFront() {
-        if (head == null) throw new NoSuchElementException("lista vacía");
-        return head.value;
-    }
-
-    @Override
-    public T topBack() {
-        Node<T> last = lastNode();
-        if (last == null) throw new NoSuchElementException("lista vacía");
-        return last.value;
+        return nn;
     }
 }

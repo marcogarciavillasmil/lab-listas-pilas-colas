@@ -1,7 +1,6 @@
 package bench;
 
 import stack.ArrayStack;
-import stack.CircularArrayStack;
 import stack.MyStack;
 
 import java.util.LinkedHashMap;
@@ -11,13 +10,12 @@ import java.util.function.Supplier;
 
 public class StackBenchmark {
 
-    static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
     static final Random RNG = new Random(42);
+    static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
 
     public static void run() throws Exception {
         Map<String, Supplier<MyStack<Integer>>> impls = new LinkedHashMap<>();
         impls.put("ArrayDinamico", ArrayStack::new);
-        impls.put("ArrayCircular", CircularArrayStack::new);
 
         Csv csv = new Csv("results/stack_benchmark.csv", "implementacion,metodo,n,reps,tiempo_prom_us");
 
@@ -44,7 +42,6 @@ public class StackBenchmark {
                     csv.row(nombre, "push", n, reps, (total / (double) reps) / 1000.0);
                 }
 
-                // pop
                 {
                     MyStack<Integer> pila = supplier.get();
                     for (int i = 0; i < n; i++) pila.push(i);
@@ -72,7 +69,6 @@ public class StackBenchmark {
                     csv.row(nombre, "peek", n, reps, (total / (double) reps) / 1000.0);
                 }
 
-                // delete es la unica que no es O(1), busca el target primero
                 {
                     MyStack<Integer> pila = supplier.get();
                     for (int i = 0; i < n; i++) pila.push(i);

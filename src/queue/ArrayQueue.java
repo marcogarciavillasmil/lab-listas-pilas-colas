@@ -2,11 +2,6 @@ package queue;
 
 import java.util.NoSuchElementException;
 
-// cola con arreglo dinamico "de la forma obvia": enqueue mete al final
-// (igual que ArrayStack.push), pero dequeue saca la posicion 0 y tiene que
-// correr TODO lo demas una posicion a la izquierda. Por eso dequeue queda en
-// O(n) -- esta es a proposito la version "mala" para compararla con la
-// circular de abajo, que arregla justo este problema.
 public class ArrayQueue<T> implements MyQueue<T> {
 
     private Object[] data;
@@ -19,6 +14,14 @@ public class ArrayQueue<T> implements MyQueue<T> {
     public ArrayQueue(int initialCapacity) {
         data = new Object[Math.max(1, initialCapacity)];
         size = 0;
+    }
+
+    @Override
+    public boolean isEmpty() { return size == 0; }
+
+    @Override
+    public int size() {
+        return size;
     }
 
     private void grow() {
@@ -35,13 +38,14 @@ public class ArrayQueue<T> implements MyQueue<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public T dequeue() {
+    public T dequeue()
+    {
         if (size == 0) throw new NoSuchElementException("cola vacía");
-        T value = (T) data[0];
+        T val = (T) data[0];
         for (int i = 0; i < size - 1; i++) data[i] = data[i + 1];
         data[size - 1] = null;
         size--;
-        return value;
+        return val;
     }
 
     @Override
@@ -49,16 +53,6 @@ public class ArrayQueue<T> implements MyQueue<T> {
     public T front() {
         if (size == 0) throw new NoSuchElementException("cola vacía");
         return (T) data[0];
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    @Override
-    public int size() {
-        return size;
     }
 
     @Override
@@ -71,7 +65,8 @@ public class ArrayQueue<T> implements MyQueue<T> {
             }
         }
         if (idx == -1) return;
-        for (int i = idx; i < size - 1; i++) data[i] = data[i + 1];
+        for (int i = idx; i < size - 1; i++)
+            data[i] = data[i + 1];
         data[size - 1] = null;
         size--;
     }

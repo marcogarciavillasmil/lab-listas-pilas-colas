@@ -1,7 +1,6 @@
 package bench;
 
 import queue.ArrayQueue;
-import queue.CircularArrayQueue;
 import queue.MyQueue;
 
 import java.util.LinkedHashMap;
@@ -11,13 +10,12 @@ import java.util.function.Supplier;
 
 public class QueueBenchmark {
 
-    static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
     static final Random RNG = new Random(42);
+    static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
 
     public static void run() throws Exception {
         Map<String, Supplier<MyQueue<Integer>>> impls = new LinkedHashMap<>();
         impls.put("ArrayDinamico", ArrayQueue::new);
-        impls.put("ArrayCircular", CircularArrayQueue::new);
 
         Csv csv = new Csv("results/queue_benchmark.csv", "implementacion,metodo,n,reps,tiempo_prom_us");
 
@@ -39,14 +37,11 @@ public class QueueBenchmark {
                         cola.enqueue(-1);
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
-                        cola.delete(-1); // saco lo que acabo de meter sin tocar el resto del orden
+                        cola.delete(-1);
                     }
                     csv.row(nombre, "enqueue", n, reps, (total / (double) reps) / 1000.0);
                 }
 
-                // aqui no puedo "restaurar" facilmente porque dequeue saca el frente,
-                // asi que dejo crecer un colchon extra al armar la base y mido
-                // directo, sin deshacer
                 {
                     MyQueue<Integer> cola = supplier.get();
                     for (int i = 0; i < n + reps; i++) cola.enqueue(i);
@@ -73,7 +68,6 @@ public class QueueBenchmark {
                     csv.row(nombre, "front", n, reps, (total / (double) reps) / 1000.0);
                 }
 
-                // delete
                 {
                     MyQueue<Integer> cola = supplier.get();
                     for (int i = 0; i < n; i++) cola.enqueue(i);

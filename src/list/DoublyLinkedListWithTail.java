@@ -2,14 +2,19 @@ package list;
 
 import java.util.NoSuchElementException;
 
-// la version "completa": head + tail + prev/next en cada nodo. con eso casi
-// todo queda O(1) (push/pop en ambos extremos, erase, addBefore/After).
-// find sigue en O(n) obvio, buscar por valor no tiene atajo.
 public class DoublyLinkedListWithTail<T> implements MyList<T> {
 
     private Node<T> head;
     private Node<T> tail;
     private int count;
+
+    @Override
+    public boolean empty() {
+        return head == null;
+    }
+
+    @Override
+    public int size() { return count; }
 
     @Override
     public Node<T> pushFront(T value) {
@@ -23,7 +28,8 @@ public class DoublyLinkedListWithTail<T> implements MyList<T> {
     }
 
     @Override
-    public Node<T> pushBack(T value) {
+    public Node<T> pushBack(T value)
+    {
         Node<T> node = new Node<>(value);
         node.prev = tail;
         if (tail != null) tail.next = node;
@@ -36,17 +42,30 @@ public class DoublyLinkedListWithTail<T> implements MyList<T> {
     @Override
     public T popFront() {
         if (head == null) throw new NoSuchElementException("lista vacía");
-        T value = head.value;
+        T val = head.value;
         erase(head);
-        return value;
+        return val;
     }
 
     @Override
     public T popBack() {
         if (tail == null) throw new NoSuchElementException("lista vacía");
-        T value = tail.value;
+        T val = tail.value;
         erase(tail);
-        return value;
+        return val;
+    }
+
+    @Override
+    public T topFront() {
+        if (head == null) throw new NoSuchElementException("lista vacía");
+        return head.value;
+    }
+
+    @Override
+    public T topBack()
+    {
+        if (tail == null) throw new NoSuchElementException("lista vacía");
+        return tail.value;
     }
 
     @Override
@@ -73,49 +92,27 @@ public class DoublyLinkedListWithTail<T> implements MyList<T> {
     public Node<T> addBefore(Node<T> node, T value) {
         if (node == null) return null;
         if (node == head) return pushFront(value);
-        Node<T> newNode = new Node<>(value);
+        Node<T> nn = new Node<>(value);
         Node<T> prev = node.prev;
-        newNode.prev = prev;
-        newNode.next = node;
-        prev.next = newNode;
-        node.prev = newNode;
+        nn.prev = prev;
+        nn.next = node;
+        prev.next = nn;
+        node.prev = nn;
         count++;
-        return newNode;
+        return nn;
     }
 
     @Override
     public Node<T> addAfter(Node<T> node, T value) {
         if (node == null) return null;
         if (node == tail) return pushBack(value);
-        Node<T> newNode = new Node<>(value);
+        Node<T> nn = new Node<>(value);
         Node<T> next = node.next;
-        newNode.prev = node;
-        newNode.next = next;
-        node.next = newNode;
-        next.prev = newNode;
+        nn.prev = node;
+        nn.next = next;
+        node.next = nn;
+        next.prev = nn;
         count++;
-        return newNode;
-    }
-
-    @Override
-    public boolean empty() {
-        return head == null;
-    }
-
-    @Override
-    public int size() {
-        return count;
-    }
-
-    @Override
-    public T topFront() {
-        if (head == null) throw new NoSuchElementException("lista vacía");
-        return head.value;
-    }
-
-    @Override
-    public T topBack() {
-        if (tail == null) throw new NoSuchElementException("lista vacía");
-        return tail.value;
+        return nn;
     }
 }
