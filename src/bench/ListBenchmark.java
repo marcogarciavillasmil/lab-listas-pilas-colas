@@ -7,6 +7,8 @@ import list.Node;
 import list.SinglyLinkedListNoTail;
 import list.SinglyLinkedListWithTail;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -16,7 +18,8 @@ public class ListBenchmark {
 
     static final Random RNG = new Random(42);
     static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
-    static final int WARMUP_OPS = 20_000;
+    static final int LOTE = 1000;
+    static final int LOTES = 50;
 
     static int repsBusqueda(int n) {
         int r = n / 20;
@@ -25,31 +28,12 @@ public class ListBenchmark {
         return r;
     }
 
-    static int repsExtremos(int n)
-    {
-        if (n <= 1000) return 300;
-        if (n <= 10_000) return 150;
-        if (n <= 100_000) return 50;
-        return 15;
+    static int loteLargo(int n) {
+        return Math.max(1, Math.min(LOTE, 2_000_000 / n));
     }
 
-    static void calentar(Supplier<MyList<Integer>> supplier) {
-        MyList<Integer> lista = supplier.get();
-        for (int i = 0; i < 1000; i++) lista.pushFront(i);
-        for (int i = 0; i < WARMUP_OPS; i++) {
-            lista.pushFront(-1);
-            lista.popFront();
-            lista.pushBack(-1);
-            lista.popBack();
-            lista.topFront();
-            lista.topBack();
-            lista.find(RNG.nextInt(1000));
-        }
-        for (int i = 0; i < 500; i++) {
-            Node<Integer> nodo = lista.find(RNG.nextInt(1000));
-            if (nodo != null) lista.addAfter(nodo, -1);
-        }
-    }
+    static int sink;
+    static volatile int cero = 0;
 
     public static void run() throws Exception {
         Map<String, Supplier<MyList<Integer>>> impls = new LinkedHashMap<>();
@@ -59,113 +43,134 @@ public class ListBenchmark {
         impls.put("DoublyWithTail", DoublyLinkedListWithTail::new);
 
         System.out.println("calentando JVM...");
-        for (Supplier<MyList<Integer>> sup : impls.values()) calentar(sup);
+        Path tmp = Files.createTempFile("calentamiento", ".csv");
+        Csv descarte = new Csv(tmp.toString(), "descarte");
+        medir(impls, descarte, new int[]{10, 100, 1_000, 10_000});
+        descarte.close();
+        Files.delete(tmp);
 
         Csv csv = new Csv("results/list_benchmark.csv", "implementacion,metodo,n,reps,tiempo_prom_us");
+        medir(impls, csv, SIZES);
+        csv.close();
+    }
 
+    static void medir(Map<String, Supplier<MyList<Integer>>> impls, Csv csv, int[] tamanos) {
         for (Map.Entry<String, Supplier<MyList<Integer>>> impl : impls.entrySet()) {
             String nombre = impl.getKey();
             Supplier<MyList<Integer>> supplier = impl.getValue();
 
-            for (int n : SIZES) {
+            for (int n : tamanos) {
                 System.out.println(nombre + " n=" + n);
-                int repsE = repsExtremos(n);
+                int largo = loteLargo(n);
                 int repsD = repsBusqueda(n);
+                System.gc();
 
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
-                    for (int i = 0; i < repsE; i++) {
+                    for (int r = 0; r < LOTES; r++) {
                         long t0 = System.nanoTime();
-                        lista.pushFront(-1);
+                        for (int i = 0; i < LOTE; i++) lista.pushFront(-1);
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
-                        lista.popFront();
+                        for (int i = 0; i < LOTE; i++) lista.popFront();
                     }
-                    csv.row(nombre, "pushFront", n, repsE, (total / (double) repsE) / 1000.0);
+                    int ops = LOTES * LOTE;
+                    csv.row(nombre, "pushFront", n, ops, (total / (double) ops) / 1000.0);
                 }
 
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
-                    for (int i = 0; i < repsE; i++) {
+                    for (int r = 0; r < LOTES; r++) {
+                        for (int i = 0; i < largo; i++) lista.pushBack(-1);
                         long t0 = System.nanoTime();
-                        lista.pushBack(-1);
+                        for (int i = 0; i < largo; i++) lista.popBack();
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
-                        lista.popBack();
                     }
-                    csv.row(nombre, "pushBack", n, repsE, (total / (double) repsE) / 1000.0);
+                    int ops = LOTES * largo;
+                    csv.row(nombre, "popBack", n, ops, (total / (double) ops) / 1000.0);
                 }
 
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
-                    for (int i = 0; i < repsE; i++) {
-                        lista.pushFront(-1);
+                    for (int r = 0; r < LOTES; r++) {
                         long t0 = System.nanoTime();
-                        lista.popFront();
+                        for (int i = 0; i < largo; i++) lista.pushBack(-1);
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
+                        for (int i = 0; i < largo; i++) lista.popBack();
                     }
-                    csv.row(nombre, "popFront", n, repsE, (total / (double) repsE) / 1000.0);
+                    int ops = LOTES * largo;
+                    csv.row(nombre, "pushBack", n, ops, (total / (double) ops) / 1000.0);
                 }
 
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
-                    for (int i = 0; i < repsE; i++) {
-                        lista.pushBack(-1);
+                    for (int r = 0; r < LOTES; r++) {
+                        for (int i = 0; i < LOTE; i++) lista.pushFront(-1);
                         long t0 = System.nanoTime();
-                        lista.popBack();
+                        for (int i = 0; i < LOTE; i++) lista.popFront();
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
                     }
-                    csv.row(nombre, "popBack", n, repsE, (total / (double) repsE) / 1000.0);
+                    int ops = LOTES * LOTE;
+                    csv.row(nombre, "popFront", n, ops, (total / (double) ops) / 1000.0);
                 }
 
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
-                    for (int i = 0; i < repsE; i++) {
+                    int suma = 0;
+                    for (int r = 0; r < LOTES; r++) {
                         long t0 = System.nanoTime();
-                        lista.topFront();
+                        for (int i = 0; i < LOTE; i++) suma += lista.topFront() + cero;
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
                     }
-                    csv.row(nombre, "topFront", n, repsE, (total / (double) repsE) / 1000.0);
+                    sink += suma;
+                    int ops = LOTES * LOTE;
+                    csv.row(nombre, "topFront", n, ops, (total / (double) ops) / 1000.0);
                 }
 
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
-                    for (int i = 0; i < repsE; i++) {
+                    int suma = 0;
+                    for (int r = 0; r < LOTES; r++) {
                         long t0 = System.nanoTime();
-                        lista.topBack();
+                        for (int i = 0; i < largo; i++) suma += lista.topBack() + cero;
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
                     }
-                    csv.row(nombre, "topBack", n, repsE, (total / (double) repsE) / 1000.0);
+                    sink += suma;
+                    int ops = LOTES * largo;
+                    csv.row(nombre, "topBack", n, ops, (total / (double) ops) / 1000.0);
                 }
 
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
-                    for (int i = 0; i < repsE; i++) {
-                        int target = RNG.nextInt(n);
+                    int[] objetivos = new int[largo];
+                    for (int r = 0; r < LOTES; r++) {
+                        for (int i = 0; i < largo; i++) objetivos[i] = RNG.nextInt(n);
                         long t0 = System.nanoTime();
-                        lista.find(target);
+                        for (int i = 0; i < largo; i++) lista.find(objetivos[i]);
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
                     }
-                    csv.row(nombre, "find", n, repsE, (total / (double) repsE) / 1000.0);
+                    int ops = LOTES * largo;
+                    csv.row(nombre, "find", n, ops, (total / (double) ops) / 1000.0);
                 }
 
                 {
@@ -223,6 +228,5 @@ public class ListBenchmark {
                 }
             }
         }
-        csv.close();
     }
 }

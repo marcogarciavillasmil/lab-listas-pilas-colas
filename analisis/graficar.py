@@ -19,6 +19,13 @@ def leer_csv(nombre):
         return list(csv.DictReader(f))
 
 
+def ajustar_y(ax):
+    bajo, alto = ax.get_ylim()
+    if alto / bajo < 100:
+        f = (100 / (alto / bajo)) ** 0.5
+        ax.set_ylim(bajo / f, alto * f)
+
+
 def graficar_comparativa(series, titulo, archivo):
     fig, ax = plt.subplots(figsize=(7, 4.5), dpi=150)
     for etiqueta, xs, ys in series:
@@ -30,6 +37,7 @@ def graficar_comparativa(series, titulo, archivo):
     ax.set_title(titulo, fontsize=16, fontweight="bold")
     ax.tick_params(axis="both", labelsize=12)
     ax.grid(True, which="both", linewidth=0.6, alpha=0.4)
+    ajustar_y(ax)
     ax.legend(fontsize=12)
     fig.tight_layout()
     os.makedirs(os.path.dirname(archivo), exist_ok=True)
@@ -52,6 +60,7 @@ def graficar_metodo(datos, implementaciones, metodo, titulo, archivo):
     ax.set_title(titulo, fontsize=16, fontweight="bold")
     ax.tick_params(axis="both", labelsize=12)
     ax.grid(True, which="both", linewidth=0.6, alpha=0.4)
+    ajustar_y(ax)
     ax.legend(fontsize=12)
     fig.tight_layout()
     os.makedirs(os.path.dirname(archivo), exist_ok=True)
@@ -71,16 +80,18 @@ def main():
     for m in metodos_lista:
         graficar_metodo(lista, impls_lista, m, f"List - {m}", os.path.join(PLOTS, f"list_{m.lower()}.png"))
 
-    impls_pila = ["ArrayDinamico"]
+    impls_pila = ["ArrayDinamico", "ArrayCircular"]
     for m in ["push", "pop", "peek", "delete"]:
         graficar_metodo(pila, impls_pila, m, f"MyStack - {m}", os.path.join(PLOTS, f"stack_{m}.png"))
+    graficar_metodo(pila, impls_pila, "pushCrecimiento", "MyStack - push armando la pila desde cero",
+                    os.path.join(PLOTS, "stack_pushcrecimiento.png"))
 
-    impls_cola = ["ArrayCircular"]
+    impls_cola = ["ArrayDinamico", "ArrayCircular"]
     for m in ["enqueue", "dequeue", "front", "delete"]:
         graficar_metodo(cola, impls_cola, m, f"MyQueue - {m}", os.path.join(PLOTS, f"queue_{m}.png"))
 
     def serie_pila(metodo):
-        return filas_de(pila, "ArrayDinamico", metodo)
+        return filas_de(pila, "ArrayCircular", metodo)
 
     def serie_cola(metodo):
         return filas_de(cola, "ArrayCircular", metodo)
@@ -88,21 +99,21 @@ def main():
     xs, ys = filas_de(lista, "SinglyNoTail", "pushFront")
     xs2, ys2 = serie_pila("push")
     graficar_comparativa(
-        [("List.pushFront (SinglyNoTail)", xs, ys), ("MyStack.push (ArrayDinamico)", xs2, ys2)],
+        [("List.pushFront (SinglyNoTail)", xs, ys), ("MyStack.push (ArrayCircular)", xs2, ys2)],
         "PushFront de List vs push de MyStack",
         os.path.join(PLOTS, "cmp_pushfront_vs_push.png"))
 
     xs, ys = filas_de(lista, "SinglyNoTail", "popFront")
     xs2, ys2 = serie_pila("pop")
     graficar_comparativa(
-        [("List.popFront (SinglyNoTail)", xs, ys), ("MyStack.pop (ArrayDinamico)", xs2, ys2)],
+        [("List.popFront (SinglyNoTail)", xs, ys), ("MyStack.pop (ArrayCircular)", xs2, ys2)],
         "PopFront de List vs pop de MyStack",
         os.path.join(PLOTS, "cmp_popfront_vs_pop.png"))
 
     xs, ys = filas_de(lista, "SinglyNoTail", "topFront")
     xs2, ys2 = serie_pila("peek")
     graficar_comparativa(
-        [("List.topFront (SinglyNoTail)", xs, ys), ("MyStack.peek (ArrayDinamico)", xs2, ys2)],
+        [("List.topFront (SinglyNoTail)", xs, ys), ("MyStack.peek (ArrayCircular)", xs2, ys2)],
         "TopFront de List vs peek de MyStack",
         os.path.join(PLOTS, "cmp_topfront_vs_peek.png"))
 
@@ -131,7 +142,7 @@ def main():
     xs2, ys2 = serie_pila("delete")
     xs3, ys3 = serie_cola("delete")
     graficar_comparativa(
-        [("List.erase (DoublyNoTail)", xs, ys), ("MyStack.delete (ArrayDinamico)", xs2, ys2),
+        [("List.erase (DoublyNoTail)", xs, ys), ("MyStack.delete (ArrayCircular)", xs2, ys2),
          ("MyQueue.delete (ArrayCircular)", xs3, ys3)],
         "Erase de List vs delete de MyStack/MyQueue",
         os.path.join(PLOTS, "cmp_erase_vs_delete.png"))

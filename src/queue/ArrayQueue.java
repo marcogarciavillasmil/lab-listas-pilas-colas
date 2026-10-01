@@ -5,7 +5,6 @@ import java.util.NoSuchElementException;
 public class ArrayQueue<T> implements MyQueue<T> {
 
     private Object[] data;
-    private int head;
     private int size;
 
     public ArrayQueue() {
@@ -14,8 +13,13 @@ public class ArrayQueue<T> implements MyQueue<T> {
 
     public ArrayQueue(int initialCapacity) {
         data = new Object[Math.max(1, initialCapacity)];
-        head = 0;
         size = 0;
+    }
+
+    private void grow() {
+        Object[] nuevo = new Object[data.length * 2];
+        System.arraycopy(data, 0, nuevo, 0, size);
+        data = nuevo;
     }
 
     @Override
@@ -26,58 +30,41 @@ public class ArrayQueue<T> implements MyQueue<T> {
         return size;
     }
 
-    private int pos(int k) {
-        return (head + k) % data.length;
-    }
-
-    private void grow() {
-        Object[] nuevo = new Object[data.length * 2];
-        for (int i = 0; i < size; i++) nuevo[i] = data[pos(i)];
-        data = nuevo;
-        head = 0;
-    }
-
     @Override
-    public void enqueue(T x) {
+    public void enqueue(T x)
+    {
         if (size == data.length) grow();
-        data[pos(size)] = x;
-        size++;
+        data[size++] = x;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public T dequeue()
-    {
+    public T dequeue() {
         if (size == 0) throw new NoSuchElementException("cola vacía");
-        T val = (T) data[head];
-        data[head] = null;
-        head = (head + 1) % data.length;
-        size--;
-        return val;
+        T primero = (T) data[0];
+        for (int i = 1; i < size; i++) data[i - 1] = data[i];
+        data[--size] = null;
+        return primero;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T front() {
         if (size == 0) throw new NoSuchElementException("cola vacía");
-        return (T) data[head];
+        return (T) data[0];
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void delete(T n) {
         int idx = -1;
         for (int i = 0; i < size; i++) {
-            Object v = data[pos(i)];
-            if (v == null ? n == null : v.equals(n)) {
+            if (data[i] == null ? n == null : data[i].equals(n)) {
                 idx = i;
                 break;
             }
         }
         if (idx == -1) return;
-        for (int i = idx; i < size - 1; i++)
-            data[pos(i)] = data[pos(i + 1)];
-        data[pos(size - 1)] = null;
-        size--;
+        for (int i = idx; i < size - 1; i++) data[i] = data[i + 1];
+        data[--size] = null;
     }
 }

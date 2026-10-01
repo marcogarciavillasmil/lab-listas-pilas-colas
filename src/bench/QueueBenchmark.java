@@ -1,8 +1,11 @@
 package bench;
 
 import queue.ArrayQueue;
+import queue.CircularArrayQueue;
 import queue.MyQueue;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -12,78 +15,81 @@ public class QueueBenchmark {
 
     static final Random RNG = new Random(42);
     static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
-    static final int WARMUP_OPS = 20_000;
-
-    static void calentar(Supplier<MyQueue<Integer>> supplier) {
-        MyQueue<Integer> cola = supplier.get();
-        for (int i = 0; i < 1000; i++) cola.enqueue(i);
-        for (int i = 0; i < WARMUP_OPS; i++) {
-            cola.enqueue(-1);
-            cola.front();
-            cola.dequeue();
-        }
-        for (int i = 0; i < 500; i++) {
-            cola.delete(RNG.nextInt(1000));
-            cola.enqueue(RNG.nextInt(1000));
-        }
-    }
+    static final int LOTE = 1000;
+    static final int LOTES = 50;
+    static int sink;
+    static volatile int cero = 0;
 
     public static void run() throws Exception {
         Map<String, Supplier<MyQueue<Integer>>> impls = new LinkedHashMap<>();
-        impls.put("ArrayCircular", ArrayQueue::new);
+        impls.put("ArrayDinamico", ArrayQueue::new);
+        impls.put("ArrayCircular", CircularArrayQueue::new);
 
         System.out.println("calentando JVM...");
-        for (Supplier<MyQueue<Integer>> sup : impls.values()) calentar(sup);
+        Path tmp = Files.createTempFile("calentamiento", ".csv");
+        Csv descarte = new Csv(tmp.toString(), "descarte");
+        medir(impls, descarte, new int[]{10, 100, 1_000, 10_000});
+        descarte.close();
+        Files.delete(tmp);
 
         Csv csv = new Csv("results/queue_benchmark.csv", "implementacion,metodo,n,reps,tiempo_prom_us");
+        medir(impls, csv, SIZES);
+        csv.close();
+    }
 
+    static void medir(Map<String, Supplier<MyQueue<Integer>>> impls, Csv csv, int[] tamanos) {
         for (Map.Entry<String, Supplier<MyQueue<Integer>>> impl : impls.entrySet()) {
             String nombre = impl.getKey();
             Supplier<MyQueue<Integer>> supplier = impl.getValue();
 
-            for (int n : SIZES) {
+            for (int n : tamanos) {
                 System.out.println(nombre + " n=" + n);
-                int reps = n <= 1000 ? 300 : n <= 10_000 ? 150 : n <= 100_000 ? 50 : 15;
                 int repsDel = Math.max(5, Math.min(100, n / 20));
+                int ops = LOTES * LOTE;
+                int loteDeq = nombre.equals("ArrayDinamico") ? Math.max(1, Math.min(LOTE, 2_000_000 / n)) : LOTE;
+                int opsDeq = LOTES * loteDeq;
+                System.gc();
 
                 {
-                    MyQueue<Integer> cola = supplier.get();
-                    for (int i = 0; i < n; i++) cola.enqueue(i);
                     long total = 0;
-                    for (int i = 0; i < reps; i++) {
+                    for (int r = 0; r < LOTES; r++) {
+                        MyQueue<Integer> cola = supplier.get();
+                        for (int i = 0; i < n; i++) cola.enqueue(i);
                         long t0 = System.nanoTime();
-                        cola.enqueue(-1);
-                        long t1 = System.nanoTime();
-                        total += (t1 - t0);
-                        cola.delete(-1);
-                    }
-                    csv.row(nombre, "enqueue", n, reps, (total / (double) reps) / 1000.0);
-                }
-
-                {
-                    MyQueue<Integer> cola = supplier.get();
-                    for (int i = 0; i < n + reps; i++) cola.enqueue(i);
-                    long total = 0;
-                    for (int i = 0; i < reps; i++) {
-                        long t0 = System.nanoTime();
-                        cola.dequeue();
+                        for (int i = 0; i < LOTE; i++) cola.enqueue(-1);
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
                     }
-                    csv.row(nombre, "dequeue", n, reps, (total / (double) reps) / 1000.0);
+                    csv.row(nombre, "enqueue", n, ops, (total / (double) ops) / 1000.0);
                 }
 
                 {
                     MyQueue<Integer> cola = supplier.get();
                     for (int i = 0; i < n; i++) cola.enqueue(i);
                     long total = 0;
-                    for (int i = 0; i < reps; i++) {
+                    for (int r = 0; r < LOTES; r++) {
+                        for (int i = 0; i < loteDeq; i++) cola.enqueue(-1);
                         long t0 = System.nanoTime();
-                        cola.front();
+                        for (int i = 0; i < loteDeq; i++) cola.dequeue();
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
                     }
-                    csv.row(nombre, "front", n, reps, (total / (double) reps) / 1000.0);
+                    csv.row(nombre, "dequeue", n, opsDeq, (total / (double) opsDeq) / 1000.0);
+                }
+
+                {
+                    MyQueue<Integer> cola = supplier.get();
+                    for (int i = 0; i < n; i++) cola.enqueue(i);
+                    long total = 0;
+                    int suma = 0;
+                    for (int r = 0; r < LOTES; r++) {
+                        long t0 = System.nanoTime();
+                        for (int i = 0; i < LOTE; i++) suma += cola.front() + cero;
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    sink += suma;
+                    csv.row(nombre, "front", n, ops, (total / (double) ops) / 1000.0);
                 }
 
                 {
@@ -101,6 +107,5 @@ public class QueueBenchmark {
                 }
             }
         }
-        csv.close();
     }
 }
