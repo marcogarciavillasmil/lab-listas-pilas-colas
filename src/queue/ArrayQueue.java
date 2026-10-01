@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 public class ArrayQueue<T> implements MyQueue<T> {
 
     private Object[] data;
+    private int head;
     private int size;
 
     public ArrayQueue() {
@@ -13,6 +14,7 @@ public class ArrayQueue<T> implements MyQueue<T> {
 
     public ArrayQueue(int initialCapacity) {
         data = new Object[Math.max(1, initialCapacity)];
+        head = 0;
         size = 0;
     }
 
@@ -24,16 +26,22 @@ public class ArrayQueue<T> implements MyQueue<T> {
         return size;
     }
 
+    private int pos(int k) {
+        return (head + k) % data.length;
+    }
+
     private void grow() {
-        Object[] bigger = new Object[data.length * 2];
-        System.arraycopy(data, 0, bigger, 0, size);
-        data = bigger;
+        Object[] nuevo = new Object[data.length * 2];
+        for (int i = 0; i < size; i++) nuevo[i] = data[pos(i)];
+        data = nuevo;
+        head = 0;
     }
 
     @Override
     public void enqueue(T x) {
         if (size == data.length) grow();
-        data[size++] = x;
+        data[pos(size)] = x;
+        size++;
     }
 
     @Override
@@ -41,9 +49,9 @@ public class ArrayQueue<T> implements MyQueue<T> {
     public T dequeue()
     {
         if (size == 0) throw new NoSuchElementException("cola vacía");
-        T val = (T) data[0];
-        for (int i = 0; i < size - 1; i++) data[i] = data[i + 1];
-        data[size - 1] = null;
+        T val = (T) data[head];
+        data[head] = null;
+        head = (head + 1) % data.length;
         size--;
         return val;
     }
@@ -52,22 +60,24 @@ public class ArrayQueue<T> implements MyQueue<T> {
     @SuppressWarnings("unchecked")
     public T front() {
         if (size == 0) throw new NoSuchElementException("cola vacía");
-        return (T) data[0];
+        return (T) data[head];
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void delete(T n) {
         int idx = -1;
         for (int i = 0; i < size; i++) {
-            if (data[i] == null ? n == null : data[i].equals(n)) {
+            Object v = data[pos(i)];
+            if (v == null ? n == null : v.equals(n)) {
                 idx = i;
                 break;
             }
         }
         if (idx == -1) return;
         for (int i = idx; i < size - 1; i++)
-            data[i] = data[i + 1];
-        data[size - 1] = null;
+            data[pos(i)] = data[pos(i + 1)];
+        data[pos(size - 1)] = null;
         size--;
     }
 }

@@ -16,6 +16,7 @@ public class ListBenchmark {
 
     static final Random RNG = new Random(42);
     static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
+    static final int WARMUP_OPS = 20_000;
 
     static int repsBusqueda(int n) {
         int r = n / 20;
@@ -32,12 +33,33 @@ public class ListBenchmark {
         return 15;
     }
 
+    static void calentar(Supplier<MyList<Integer>> supplier) {
+        MyList<Integer> lista = supplier.get();
+        for (int i = 0; i < 1000; i++) lista.pushFront(i);
+        for (int i = 0; i < WARMUP_OPS; i++) {
+            lista.pushFront(-1);
+            lista.popFront();
+            lista.pushBack(-1);
+            lista.popBack();
+            lista.topFront();
+            lista.topBack();
+            lista.find(RNG.nextInt(1000));
+        }
+        for (int i = 0; i < 500; i++) {
+            Node<Integer> nodo = lista.find(RNG.nextInt(1000));
+            if (nodo != null) lista.addAfter(nodo, -1);
+        }
+    }
+
     public static void run() throws Exception {
         Map<String, Supplier<MyList<Integer>>> impls = new LinkedHashMap<>();
         impls.put("SinglyNoTail", SinglyLinkedListNoTail::new);
         impls.put("SinglyWithTail", SinglyLinkedListWithTail::new);
         impls.put("DoublyNoTail", DoublyLinkedListNoTail::new);
         impls.put("DoublyWithTail", DoublyLinkedListWithTail::new);
+
+        System.out.println("calentando JVM...");
+        for (Supplier<MyList<Integer>> sup : impls.values()) calentar(sup);
 
         Csv csv = new Csv("results/list_benchmark.csv", "implementacion,metodo,n,reps,tiempo_prom_us");
 
@@ -111,6 +133,32 @@ public class ListBenchmark {
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
                     for (int i = 0; i < repsE; i++) {
+                        long t0 = System.nanoTime();
+                        lista.topFront();
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "topFront", n, repsE, (total / (double) repsE) / 1000.0);
+                }
+
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsE; i++) {
+                        long t0 = System.nanoTime();
+                        lista.topBack();
+                        long t1 = System.nanoTime();
+                        total += (t1 - t0);
+                    }
+                    csv.row(nombre, "topBack", n, repsE, (total / (double) repsE) / 1000.0);
+                }
+
+                {
+                    MyList<Integer> lista = supplier.get();
+                    for (int i = 0; i < n; i++) lista.pushFront(i);
+                    long total = 0;
+                    for (int i = 0; i < repsE; i++) {
                         int target = RNG.nextInt(n);
                         long t0 = System.nanoTime();
                         lista.find(target);
@@ -124,6 +172,7 @@ public class ListBenchmark {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
+                    int hechas = 0;
                     for (int i = 0; i < repsD; i++) {
                         int target = RNG.nextInt(n);
                         Node<Integer> nodo = lista.find(target);
@@ -132,14 +181,16 @@ public class ListBenchmark {
                         lista.erase(nodo);
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
+                        hechas++;
                     }
-                    csv.row(nombre, "erase", n, repsD, (total / (double) repsD) / 1000.0);
+                    csv.row(nombre, "erase", n, hechas, hechas == 0 ? 0.0 : (total / (double) hechas) / 1000.0);
                 }
 
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
+                    int hechas = 0;
                     for (int i = 0; i < repsD; i++) {
                         int target = RNG.nextInt(n);
                         Node<Integer> nodo = lista.find(target);
@@ -148,14 +199,16 @@ public class ListBenchmark {
                         lista.addBefore(nodo, -1);
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
+                        hechas++;
                     }
-                    csv.row(nombre, "addBefore", n, repsD, (total / (double) repsD) / 1000.0);
+                    csv.row(nombre, "addBefore", n, hechas, hechas == 0 ? 0.0 : (total / (double) hechas) / 1000.0);
                 }
 
                 {
                     MyList<Integer> lista = supplier.get();
                     for (int i = 0; i < n; i++) lista.pushFront(i);
                     long total = 0;
+                    int hechas = 0;
                     for (int i = 0; i < repsD; i++) {
                         int target = RNG.nextInt(n);
                         Node<Integer> nodo = lista.find(target);
@@ -164,8 +217,9 @@ public class ListBenchmark {
                         lista.addAfter(nodo, -1);
                         long t1 = System.nanoTime();
                         total += (t1 - t0);
+                        hechas++;
                     }
-                    csv.row(nombre, "addAfter", n, repsD, (total / (double) repsD) / 1000.0);
+                    csv.row(nombre, "addAfter", n, hechas, hechas == 0 ? 0.0 : (total / (double) hechas) / 1000.0);
                 }
             }
         }

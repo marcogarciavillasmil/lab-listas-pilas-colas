@@ -12,10 +12,28 @@ public class StackBenchmark {
 
     static final Random RNG = new Random(42);
     static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
+    static final int WARMUP_OPS = 20_000;
+
+    static void calentar(Supplier<MyStack<Integer>> supplier) {
+        MyStack<Integer> pila = supplier.get();
+        for (int i = 0; i < 1000; i++) pila.push(i);
+        for (int i = 0; i < WARMUP_OPS; i++) {
+            pila.push(-1);
+            pila.peek();
+            pila.pop();
+        }
+        for (int i = 0; i < 500; i++) {
+            pila.delete(RNG.nextInt(1000));
+            pila.push(RNG.nextInt(1000));
+        }
+    }
 
     public static void run() throws Exception {
         Map<String, Supplier<MyStack<Integer>>> impls = new LinkedHashMap<>();
         impls.put("ArrayDinamico", ArrayStack::new);
+
+        System.out.println("calentando JVM...");
+        for (Supplier<MyStack<Integer>> sup : impls.values()) calentar(sup);
 
         Csv csv = new Csv("results/stack_benchmark.csv", "implementacion,metodo,n,reps,tiempo_prom_us");
 

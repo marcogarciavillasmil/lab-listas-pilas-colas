@@ -12,10 +12,28 @@ public class QueueBenchmark {
 
     static final Random RNG = new Random(42);
     static final int[] SIZES = {10, 100, 1_000, 10_000, 100_000, 1_000_000};
+    static final int WARMUP_OPS = 20_000;
+
+    static void calentar(Supplier<MyQueue<Integer>> supplier) {
+        MyQueue<Integer> cola = supplier.get();
+        for (int i = 0; i < 1000; i++) cola.enqueue(i);
+        for (int i = 0; i < WARMUP_OPS; i++) {
+            cola.enqueue(-1);
+            cola.front();
+            cola.dequeue();
+        }
+        for (int i = 0; i < 500; i++) {
+            cola.delete(RNG.nextInt(1000));
+            cola.enqueue(RNG.nextInt(1000));
+        }
+    }
 
     public static void run() throws Exception {
         Map<String, Supplier<MyQueue<Integer>>> impls = new LinkedHashMap<>();
-        impls.put("ArrayDinamico", ArrayQueue::new);
+        impls.put("ArrayCircular", ArrayQueue::new);
+
+        System.out.println("calentando JVM...");
+        for (Supplier<MyQueue<Integer>> sup : impls.values()) calentar(sup);
 
         Csv csv = new Csv("results/queue_benchmark.csv", "implementacion,metodo,n,reps,tiempo_prom_us");
 

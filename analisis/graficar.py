@@ -66,7 +66,8 @@ def main():
     cola = leer_csv("queue_benchmark.csv")
 
     impls_lista = ["SinglyNoTail", "SinglyWithTail", "DoublyNoTail", "DoublyWithTail"]
-    metodos_lista = ["pushFront", "pushBack", "popFront", "popBack", "find", "erase", "addBefore", "addAfter"]
+    metodos_lista = ["pushFront", "pushBack", "popFront", "popBack", "topFront", "topBack",
+                      "find", "erase", "addBefore", "addAfter"]
     for m in metodos_lista:
         graficar_metodo(lista, impls_lista, m, f"List - {m}", os.path.join(PLOTS, f"list_{m.lower()}.png"))
 
@@ -74,53 +75,64 @@ def main():
     for m in ["push", "pop", "peek", "delete"]:
         graficar_metodo(pila, impls_pila, m, f"MyStack - {m}", os.path.join(PLOTS, f"stack_{m}.png"))
 
-    impls_cola = ["ArrayDinamico"]
+    impls_cola = ["ArrayCircular"]
     for m in ["enqueue", "dequeue", "front", "delete"]:
         graficar_metodo(cola, impls_cola, m, f"MyQueue - {m}", os.path.join(PLOTS, f"queue_{m}.png"))
-
-    def serie_cola(metodo):
-        return filas_de(cola, "ArrayDinamico", metodo)
-
-    def serie_lista(metodo):
-        return filas_de(lista, "DoublyWithTail", metodo)
 
     def serie_pila(metodo):
         return filas_de(pila, "ArrayDinamico", metodo)
 
-    xs, ys = serie_lista("pushFront")
+    def serie_cola(metodo):
+        return filas_de(cola, "ArrayCircular", metodo)
+
+    xs, ys = filas_de(lista, "SinglyNoTail", "pushFront")
     xs2, ys2 = serie_pila("push")
     graficar_comparativa(
-        [("List.pushFront (DoublyWithTail)", xs, ys), ("MyStack.push (ArrayDinamico)", xs2, ys2)],
+        [("List.pushFront (SinglyNoTail)", xs, ys), ("MyStack.push (ArrayDinamico)", xs2, ys2)],
         "PushFront de List vs push de MyStack",
         os.path.join(PLOTS, "cmp_pushfront_vs_push.png"))
 
-    xs, ys = serie_lista("popFront")
+    xs, ys = filas_de(lista, "SinglyNoTail", "popFront")
     xs2, ys2 = serie_pila("pop")
     graficar_comparativa(
-        [("List.popFront (DoublyWithTail)", xs, ys), ("MyStack.pop (ArrayDinamico)", xs2, ys2)],
+        [("List.popFront (SinglyNoTail)", xs, ys), ("MyStack.pop (ArrayDinamico)", xs2, ys2)],
         "PopFront de List vs pop de MyStack",
         os.path.join(PLOTS, "cmp_popfront_vs_pop.png"))
 
-    xs, ys = serie_lista("pushBack")
+    xs, ys = filas_de(lista, "SinglyNoTail", "topFront")
+    xs2, ys2 = serie_pila("peek")
+    graficar_comparativa(
+        [("List.topFront (SinglyNoTail)", xs, ys), ("MyStack.peek (ArrayDinamico)", xs2, ys2)],
+        "TopFront de List vs peek de MyStack",
+        os.path.join(PLOTS, "cmp_topfront_vs_peek.png"))
+
+    xs, ys = filas_de(lista, "SinglyWithTail", "pushBack")
     xs2, ys2 = serie_cola("enqueue")
     graficar_comparativa(
-        [("List.pushBack (DoublyWithTail)", xs, ys), ("MyQueue.enqueue (ArrayDinamico)", xs2, ys2)],
+        [("List.pushBack (SinglyWithTail)", xs, ys), ("MyQueue.enqueue (ArrayCircular)", xs2, ys2)],
         "PushBack de List vs enqueue de MyQueue",
         os.path.join(PLOTS, "cmp_pushback_vs_enqueue.png"))
 
-    xs, ys = serie_lista("popFront")
+    xs, ys = filas_de(lista, "SinglyNoTail", "popFront")
     xs2, ys2 = serie_cola("dequeue")
     graficar_comparativa(
-        [("List.popFront (DoublyWithTail)", xs, ys), ("MyQueue.dequeue (ArrayDinamico)", xs2, ys2)],
+        [("List.popFront (SinglyNoTail)", xs, ys), ("MyQueue.dequeue (ArrayCircular)", xs2, ys2)],
         "PopFront de List vs dequeue de MyQueue",
         os.path.join(PLOTS, "cmp_popfront_vs_dequeue.png"))
 
-    xs, ys = serie_lista("erase")
+    xs, ys = filas_de(lista, "SinglyNoTail", "topFront")
+    xs2, ys2 = serie_cola("front")
+    graficar_comparativa(
+        [("List.topFront (SinglyNoTail)", xs, ys), ("MyQueue.front (ArrayCircular)", xs2, ys2)],
+        "TopFront de List vs front de MyQueue",
+        os.path.join(PLOTS, "cmp_topfront_vs_front.png"))
+
+    xs, ys = filas_de(lista, "DoublyNoTail", "erase")
     xs2, ys2 = serie_pila("delete")
     xs3, ys3 = serie_cola("delete")
     graficar_comparativa(
-        [("List.erase (DoublyWithTail)", xs, ys), ("MyStack.delete (ArrayDinamico)", xs2, ys2),
-         ("MyQueue.delete (ArrayDinamico)", xs3, ys3)],
+        [("List.erase (DoublyNoTail)", xs, ys), ("MyStack.delete (ArrayDinamico)", xs2, ys2),
+         ("MyQueue.delete (ArrayCircular)", xs3, ys3)],
         "Erase de List vs delete de MyStack/MyQueue",
         os.path.join(PLOTS, "cmp_erase_vs_delete.png"))
 
